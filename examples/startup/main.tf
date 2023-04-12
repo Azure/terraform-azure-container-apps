@@ -50,6 +50,7 @@ module "containerapps" {
       }
     }
   ]
+  log_analytics_workspace_name = "testlaws"
 }
 
 resource "azurerm_container_app" "dashboard" {

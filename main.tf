@@ -4,7 +4,7 @@ data "azurerm_resource_group" "azca" {
 
 resource "azurerm_log_analytics_workspace" "laws" {
   location                           = coalesce(var.location, data.azurerm_resource_group.azca.location)
-  name                               = "LogAnalyticsWorkspace"
+  name                               = var.log_analytics_workspace_name
   resource_group_name                = var.resource_group_name
   allow_resource_only_permissions    = var.allow_resource_only_permissions
   cmk_for_query_forced               = var.cmk_for_query_forced
@@ -19,10 +19,10 @@ resource "azurerm_log_analytics_workspace" "laws" {
 }
 
 resource "azurerm_container_app_environment" "containerenv" {
-  name                           = var.managed_environment_name
   location                       = coalesce(var.location, data.azurerm_resource_group.azca.location)
-  resource_group_name            = var.resource_group_name
   log_analytics_workspace_id     = azurerm_log_analytics_workspace.laws.id
+  name                           = var.managed_environment_name
+  resource_group_name            = var.resource_group_name
   infrastructure_subnet_id       = var.infrastructure_subnet_id
   internal_load_balancer_enabled = var.internal_load_balancer_enabled
   tags                           = var.environment_tags
@@ -34,14 +34,44 @@ resource "azurerm_container_app_environment" "containerenv" {
   }
 }
 
+resource "azurerm_container_app_environment_dapr_component" "dapr" {
+  count = var.dapr_component_name == null ? 0 : 1
+
+  component_type               = var.dapr_component_type
+  container_app_environment_id = azurerm_container_app_environment.containerenv.id
+  name                         = var.dapr_component_name
+  version                      = var.dapr_component_version
+  ignore_errors                = var.dapr_component_ignore_errors
+  init_timeout                 = var.dapr_component_init_timeout
+  scopes                       = var.dapr_component_scopes
+
+  dynamic "metadata" {
+    for_each = var.dapr_component_metadata == null ? [] : var.dapr_component_metadata
+
+    content {
+      name        = metadata.value.name
+      secret_name = metadata.value.secret_name
+      value       = metadata.value.value
+    }
+  }
+  dynamic "secret" {
+    for_each = var.dapr_component_secret == null ? [] : var.dapr_component_secret
+
+    content {
+      name  = secret.value.name
+      value = secret.value.value
+    }
+  }
+}
+
 resource "azurerm_container_app" "containerapp" {
   for_each = { for app in var.container_apps : app.name => app }
 
+  container_app_environment_id = azurerm_container_app_environment.containerenv.id
   name                         = each.key
   resource_group_name          = var.resource_group_name
-  container_app_environment_id = azurerm_container_app_environment.containerenv.id
-  tags                         = each.value.tags
   revision_mode                = each.value.revision_mode
+  tags                         = each.value.tags
 
   template {
     max_replicas    = each.value.template.max_replicas
@@ -52,15 +82,15 @@ resource "azurerm_container_app" "containerapp" {
       for_each = each.value.template.containers
 
       content {
-        name    = container.value.name
+        cpu     = container.value.cpu
         image   = container.value.image
+        memory  = container.value.memory
+        name    = container.value.name
         args    = container.value.args
         command = container.value.command
-        cpu     = container.value.cpu
-        memory  = container.value.memory
 
         dynamic "env" {
-          for_each = container.value.env
+          for_each = container.value.env == null ? [] : container.value.env
 
           content {
             name        = env.value.name
@@ -72,14 +102,14 @@ resource "azurerm_container_app" "containerapp" {
           for_each = container.value.liveness_probe == null ? [] : [container.value.liveness_probe]
 
           content {
+            port                    = liveness_probe.value.port
+            transport               = liveness_probe.value.transport
             failure_count_threshold = liveness_probe.value.failure_count_threshold
             host                    = liveness_probe.value.host
             initial_delay           = liveness_probe.value.initial_delay
             interval_seconds        = liveness_probe.value.interval_seconds
             path                    = liveness_probe.value.path
-            port                    = liveness_probe.value.port
             timeout                 = liveness_probe.value.timeout
-            transport               = liveness_probe.value.transport
 
             dynamic "header" {
               for_each = liveness_probe.value.header == null ? [] : [liveness_probe.value.header]
@@ -95,14 +125,14 @@ resource "azurerm_container_app" "containerapp" {
           for_each = container.value.readiness_probe == null ? [] : [container.value.readiness_probe]
 
           content {
+            port                    = readiness_probe.value.port
+            transport               = readiness_probe.value.transport
             failure_count_threshold = readiness_probe.value.failure_count_threshold
             host                    = readiness_probe.value.host
             interval_seconds        = readiness_probe.value.interval_seconds
             path                    = readiness_probe.value.path
-            port                    = readiness_probe.value.port
             success_count_threshold = readiness_probe.value.success_count_threshold
             timeout                 = readiness_probe.value.timeout
-            transport               = readiness_probe.value.transport
 
             dynamic "header" {
               for_each = readiness_probe.value.header == null ? [] : [readiness_probe.value.header]
@@ -118,13 +148,13 @@ resource "azurerm_container_app" "containerapp" {
           for_each = container.value.startup_probe == null ? [] : [container.value.startup_probe]
 
           content {
+            port                    = startup_probe.value.port
+            transport               = startup_probe.value.transport
             failure_count_threshold = startup_probe.value.failure_count_threshold
             host                    = startup_probe.value.host
             interval_seconds        = startup_probe.value.interval_seconds
             path                    = startup_probe.value.path
-            port                    = startup_probe.value.port
             timeout                 = startup_probe.value.timeout
-            transport               = startup_probe.value.transport
 
             dynamic "header" {
               for_each = startup_probe.value.header == null ? [] : [startup_probe.value.header]
@@ -156,38 +186,6 @@ resource "azurerm_container_app" "containerapp" {
       }
     }
   }
-
-  dynamic "ingress" {
-    for_each = each.value.ingress == null ? [] : [each.value.ingress]
-
-    content {
-      allow_insecure_connections = ingress.value.allow_insecure_connections
-      external_enabled           = ingress.value.external_enabled
-      target_port                = ingress.value.target_port
-      transport                  = ingress.value.transport
-
-      dynamic "traffic_weight" {
-        for_each = ingress.value.traffic_weight == null ? [] : [ingress.value.traffic_weight]
-
-        content {
-          label           = traffic_weight.value.label
-          latest_revision = traffic_weight.value.latest_revision
-          revision_suffix = traffic_weight.value.revision_suffix
-          percentage      = traffic_weight.value.percentage
-        }
-      }
-    }
-  }
-
-  dynamic "identity" {
-    for_each = each.value.identity == null ? [] : [each.value.identity]
-
-    content {
-      type         = identity.value.type
-      identity_ids = identity.value.identity_ids
-    }
-  }
-
   dynamic "dapr" {
     for_each = each.value.dapr == null ? [] : [each.value.dapr]
 
@@ -197,7 +195,35 @@ resource "azurerm_container_app" "containerapp" {
       app_protocol = dapr.value.app_protocol
     }
   }
+  dynamic "identity" {
+    for_each = each.value.identity == null ? [] : [each.value.identity]
 
+    content {
+      type         = identity.value.type
+      identity_ids = identity.value.identity_ids
+    }
+  }
+  dynamic "ingress" {
+    for_each = each.value.ingress == null ? [] : [each.value.ingress]
+
+    content {
+      target_port                = ingress.value.target_port
+      allow_insecure_connections = ingress.value.allow_insecure_connections
+      external_enabled           = ingress.value.external_enabled
+      transport                  = ingress.value.transport
+
+      dynamic "traffic_weight" {
+        for_each = ingress.value.traffic_weight == null ? [] : [ingress.value.traffic_weight]
+
+        content {
+          percentage      = traffic_weight.value.percentage
+          label           = traffic_weight.value.label
+          latest_revision = traffic_weight.value.latest_revision
+          revision_suffix = traffic_weight.value.revision_suffix
+        }
+      }
+    }
+  }
   dynamic "secret" {
     for_each = each.value.secret == null ? [] : [each.value.secret]
 

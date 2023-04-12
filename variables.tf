@@ -13,7 +13,7 @@ variable "container_apps" {
         command = optional(list(string))
         cpu     = string
         memory  = string
-        env = optional(list(object({
+        env = optional(set(object({
           name        = string
           secret_name = optional(string)
           value       = string
@@ -93,11 +93,11 @@ variable "container_apps" {
       identity_ids = optional(list(string))
     }))
 
-    dapr = optional(list(object({
+    dapr = optional(object({
       app_id       = string
       app_port     = number
       app_protocol = optional(string)
-    })))
+    }))
 
     registry = optional(list(object({
       server               = string
@@ -116,6 +116,11 @@ variable "container_apps" {
     condition     = length(var.container_apps) >= 1
     error_message = "At least one container should be provided."
   }
+}
+
+variable "log_analytics_workspace_name" {
+  description = "(Required) Specifies the name of the Log Analytics Workspace. Changing this forces a new resource to be created."
+  type        = string
 }
 
 variable "managed_environment_name" {
@@ -144,6 +149,61 @@ variable "daily_quota_gb" {
   description = "(Optional) The workspace daily quota for ingestion in GB. Defaults to `-1` which means unlimited."
   type        = number
   default     = -1
+}
+
+variable "dapr_component_ignore_errors" {
+  description = "(Optional) Should the Dapr sidecar to continue initialisation if the component fails to load? Defaults to `false`."
+  type        = bool
+  default     = false
+}
+
+variable "dapr_component_init_timeout" {
+  description = "(Optional) The timeout for component initialisation as a `ISO8601` formatted string. e.g. `5s`, `1m`, `1h`. Defaults to `5s`."
+  type        = string
+  default     = "5s"
+}
+
+variable "dapr_component_metadata" {
+  description = "(Optional) The metadata for the Dapr component."
+  type = set(object({
+    name        = string
+    secret_name = optional(string)
+    value       = string
+  }))
+  default = null
+}
+
+variable "dapr_component_name" {
+  description = "(Optional) The name of the Dapr component. Changing this forces a new resource to be created."
+  type        = string
+  default     = null
+}
+
+variable "dapr_component_scopes" {
+  description = "(Optional) A list of scopes to which this component applies."
+  type        = list(string)
+  default     = []
+}
+
+variable "dapr_component_secret" {
+  description = "(Optional) A list of secrets for the Dapr component."
+  type = set(object({
+    name  = string
+    value = string
+  }))
+  default = null
+}
+
+variable "dapr_component_type" {
+  description = "(Optional) The type of the Dapr component. For example `state.azure.blobstorage`. Changing this forces a new resource to be created."
+  type        = string
+  default     = null
+}
+
+variable "dapr_component_version" {
+  description = "(Optional) The version of the Dapr component. Changing this forces a new resource to be created."
+  type        = string
+  default     = null
 }
 
 variable "environment_tags" {
@@ -212,5 +272,5 @@ variable "reservation_capacity_in_gb_per_day" {
 variable "retention_in_days" {
   description = "(Optional) The workspace data retention in days. Possible values are either 7 (Free Tier only) or range between 30 and 730."
   type        = number
-  default     = 0
+  default     = null
 }
