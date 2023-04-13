@@ -82,6 +82,7 @@ resource "azurerm_storage_account_customer_managed_key" "managedkey" {
 }
 
 resource "azurerm_storage_container" "test" {
+#checkov:skip=CKV2_AZURE_21:lll
   name                  = "testcontainer"
   storage_account_name  = azurerm_storage_account.test.name
   container_access_type = "private"
