@@ -1,3 +1,3 @@
 variable "location" {
-  default = "West Europe"
+  default = "eastus"
 }
