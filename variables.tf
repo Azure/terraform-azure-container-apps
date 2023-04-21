@@ -151,59 +151,26 @@ variable "daily_quota_gb" {
   default     = -1
 }
 
-variable "dapr_component_ignore_errors" {
-  description = "(Optional) Should the Dapr sidecar to continue initialisation if the component fails to load? Defaults to `false`."
-  type        = bool
-  default     = false
-}
-
-variable "dapr_component_init_timeout" {
-  description = "(Optional) The timeout for component initialisation as a `ISO8601` formatted string. e.g. `5s`, `1m`, `1h`. Defaults to `5s`."
-  type        = string
-  default     = "5s"
-}
-
-variable "dapr_component_metadata" {
-  description = "(Optional) The metadata for the Dapr component."
+variable "dapr_component" {
+  description = "(Optional) The Dapr component to deploy."
   type = set(object({
-    name        = string
-    secret_name = optional(string)
-    value       = string
+    name           = string
+    component_type = string
+    version        = string
+    ignore_errors  = optional(bool, false)
+    init_timeout   = optional(string, "5s")
+    scopes         = optional(list(string))
+    metadata = optional(set(object({
+      name        = string
+      secret_name = optional(string)
+      value       = string
+    })))
+    secret = optional(set(object({
+      name  = string
+      value = string
+    })))
   }))
   default = null
-}
-
-variable "dapr_component_name" {
-  description = "(Optional) The name of the Dapr component. Changing this forces a new resource to be created."
-  type        = string
-  default     = null
-}
-
-variable "dapr_component_scopes" {
-  description = "(Optional) A list of scopes to which this component applies."
-  type        = list(string)
-  default     = []
-}
-
-variable "dapr_component_secret" {
-  description = "(Optional) A list of secrets for the Dapr component."
-  type = set(object({
-    name  = string
-    value = string
-  }))
-  default = null
-}
-
-variable "dapr_component_type" {
-  description = "(Optional) The type of the Dapr component. For example `state.azure.blobstorage`. Changing this forces a new resource to be created."
-  type        = string
-  default     = null
-}
-
-variable "dapr_component_version" {
-  description = "(Optional) The version of the Dapr component. Changing this forces a new resource to be created."
-  type        = string
-  default     = null
 }
 
 variable "environment_tags" {

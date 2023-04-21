@@ -35,18 +35,18 @@ resource "azurerm_container_app_environment" "containerenv" {
 }
 
 resource "azurerm_container_app_environment_dapr_component" "dapr" {
-  count = var.dapr_component_name == null ? 0 : 1
+  for_each = { for component in var.dapr_component : component.name => component }
 
-  component_type               = var.dapr_component_type
+  component_type               = each.value.component_type
   container_app_environment_id = azurerm_container_app_environment.containerenv.id
-  name                         = var.dapr_component_name
-  version                      = var.dapr_component_version
-  ignore_errors                = var.dapr_component_ignore_errors
-  init_timeout                 = var.dapr_component_init_timeout
-  scopes                       = var.dapr_component_scopes
+  name                         = each.key
+  version                      = each.value.version
+  ignore_errors                = each.value.ignore_errors
+  init_timeout                 = each.value.init_timeout
+  scopes                       = each.value.scopes
 
   dynamic "metadata" {
-    for_each = var.dapr_component_metadata == null ? [] : var.dapr_component_metadata
+    for_each = each.value.metadata == null ? [] : each.value.metadata
 
     content {
       name        = metadata.value.name
@@ -55,7 +55,7 @@ resource "azurerm_container_app_environment_dapr_component" "dapr" {
     }
   }
   dynamic "secret" {
-    for_each = var.dapr_component_secret == null ? [] : var.dapr_component_secret
+    for_each = each.value.secret == null ? [] : each.value.secret
 
     content {
       name  = secret.value.name

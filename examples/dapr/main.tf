@@ -23,7 +23,7 @@ data "azurerm_client_config" "current" {}
 
 data "curl" "public_ip" {
   http_method = "GET"
-  uri = "https://api.ipify.org?format=json"
+  uri         = "https://api.ipify.org?format=json"
 }
 
 locals {
@@ -41,8 +41,9 @@ resource "azurerm_key_vault" "test" {
   network_acls {
     bypass         = "AzureServices"
     default_action = "Deny"
-    ip_rules = [local.public_ip, "0.0.0.0/0"]
+    ip_rules       = [local.public_ip, "0.0.0.0/0"]
   }
+
   depends_on = [azurerm_storage_container.test]
 }
 
@@ -66,12 +67,11 @@ resource "azurerm_log_analytics_workspace" "test" {
 }
 
 resource "azurerm_key_vault_access_policy" "storage" {
-  key_vault_id = azurerm_key_vault.test.id
-  tenant_id = azurerm_storage_account.test.identity[0].tenant_id
-  object_id = azurerm_storage_account.test.identity[0].principal_id
-
-  key_permissions = ["Get", "Create", "List", "Restore", "Recover", "UnwrapKey", "WrapKey", "Purge", "Encrypt", "Decrypt", "Sign", "Verify", "GetRotationPolicy", "SetRotationPolicy"]
-  secret_permissions = ["Backup", "Delete", "Get", "List", "Purge", "Recover", "Restore", "Set"]
+  key_vault_id        = azurerm_key_vault.test.id
+  object_id           = azurerm_storage_account.test.identity[0].principal_id
+  tenant_id           = azurerm_storage_account.test.identity[0].tenant_id
+  key_permissions     = ["Get", "Create", "List", "Restore", "Recover", "UnwrapKey", "WrapKey", "Purge", "Encrypt", "Decrypt", "Sign", "Verify", "GetRotationPolicy", "SetRotationPolicy"]
+  secret_permissions  = ["Backup", "Delete", "Get", "List", "Purge", "Recover", "Restore", "Set"]
   storage_permissions = ["Get", "List", "Set", "Update", "RegenerateKey", "Recover", "Purge"]
 }
 
@@ -80,8 +80,8 @@ resource "azurerm_key_vault_access_policy" "client" {
   object_id    = data.azurerm_client_config.current.object_id
   tenant_id    = data.azurerm_client_config.current.tenant_id
 
-  key_permissions = ["Get", "Create", "Delete", "List", "Restore", "Recover", "UnwrapKey", "WrapKey", "Purge", "Encrypt", "Decrypt", "Sign", "Verify", "GetRotationPolicy", "SetRotationPolicy"]
-  secret_permissions = ["Backup", "Delete", "Get", "List", "Purge", "Recover", "Restore", "Set"]
+  key_permissions     = ["Get", "Create", "Delete", "List", "Restore", "Recover", "UnwrapKey", "WrapKey", "Purge", "Encrypt", "Decrypt", "Sign", "Verify", "GetRotationPolicy", "SetRotationPolicy"]
+  secret_permissions  = ["Backup", "Delete", "Get", "List", "Purge", "Recover", "Restore", "Set"]
   storage_permissions = ["Get", "List", "Set", "Update", "RegenerateKey", "Recover", "Purge"]
 }
 
@@ -93,10 +93,13 @@ resource "azurerm_storage_account" "test" {
   resource_group_name      = azurerm_resource_group.rg.name
   min_tls_version          = "TLS1_2"
 
+  identity {
+    type = "SystemAssigned"
+  }
   network_rules {
-    bypass = ["AzureServices"]
     default_action = "Deny"
-    ip_rules = [local.public_ip, "0.0.0.0/0"]
+    bypass         = ["AzureServices"]
+    ip_rules       = [local.public_ip, "0.0.0.0/0"]
   }
   queue_properties {
     logging {
@@ -105,9 +108,6 @@ resource "azurerm_storage_account" "test" {
       version = "1.0"
       write   = true
     }
-  }
-  identity {
-    type = "SystemAssigned"
   }
 }
 
@@ -128,7 +128,7 @@ resource "azurerm_storage_account_customer_managed_key" "managedkey" {
 }
 
 resource "azurerm_storage_container" "test" {
-#checkov:skip=CKV2_AZURE_21:lll
+  #checkov:skip=CKV2_AZURE_21:lll
   name                  = "testcontainer"
   storage_account_name  = azurerm_storage_account.test.name
   container_access_type = "private"
@@ -146,22 +146,26 @@ module "containerapps" {
   location                     = azurerm_resource_group.rg.location
   managed_environment_name     = "example-env-${random_id.env_name.hex}"
   log_analytics_workspace_name = "testlaworkspace"
-  dapr_component_type          = "state.azure.blobstorage"
-  dapr_component_name          = "statestore"
-  dapr_component_scopes        = ["nodeapp"]
-  dapr_component_version       = "v1"
-  dapr_component_metadata = [
+  dapr_component = [
     {
-      name  = "accountName"
-      value = azurerm_storage_account.test.name
-    },
-    {
-      name  = "containerName"
-      value = azurerm_storage_container.test.name
-    },
-    {
-      name  = "azureClientId"
-      value = azurerm_user_assigned_identity.test.client_id
+      name           = "statestore"
+      component_type = "state.azure.blobstorage"
+      version        = "v1"
+      scopes         = ["nodeapp"]
+      metadata = [
+        {
+          name  = "accountName"
+          value = azurerm_storage_account.test.name
+        },
+        {
+          name  = "containerName"
+          value = azurerm_storage_container.test.name
+        },
+        {
+          name  = "azureClientId"
+          value = azurerm_user_assigned_identity.test.client_id
+        }
+      ]
     }
   ]
   container_apps = [
