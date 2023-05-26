@@ -1,6 +1,6 @@
 variable "container_apps" {
   description = "The container apps to deploy."
-  type = set(object({
+  type        = map(object({
     name          = string
     tags          = optional(map(string))
     revision_mode = string
@@ -13,14 +13,14 @@ variable "container_apps" {
         command = optional(list(string))
         cpu     = string
         memory  = string
-        env = optional(set(object({
+        env     = optional(set(object({
           name        = string
           secret_name = optional(string)
-          value       = string
+          value       = /*optional?*/string
         })))
         liveness_probe = optional(object({
           failure_count_threshold = optional(number)
-          header = optional(object({
+          header                  = optional(object({
             name  = string
             value = string
           }))
@@ -34,7 +34,7 @@ variable "container_apps" {
         }))
         readiness_probe = optional(object({
           failure_count_threshold = optional(number)
-          header = optional(object({
+          header                  = optional(object({
             name  = string
             value = string
           }))
@@ -48,7 +48,7 @@ variable "container_apps" {
         }))
         startup_probe = optional(object({
           failure_count_threshold = optional(number)
-          header = optional(object({
+          header                  = optional(object({
             name  = string
             value = string
           }))
@@ -80,7 +80,7 @@ variable "container_apps" {
       external_enabled           = optional(bool, false)
       target_port                = number
       transport                  = optional(string)
-      traffic_weight = object({
+      traffic_weight             = object({
         label           = optional(string)
         latest_revision = optional(string)
         revision_suffix = optional(string)
@@ -106,6 +106,7 @@ variable "container_apps" {
       identity             = optional(string)
     })))
 
+    // sensitive
     secret = optional(list(object({
       name  = string
       value = string
@@ -118,11 +119,21 @@ variable "container_apps" {
   }
 }
 
+variable "secrets" {
+  type = map(list(object({
+    name  = string
+    value = string
+  })))
+  default   = {}
+  nullable  = false
+  sensitive = true
+}
+
 variable "log_analytics_workspace_name" {
   description = "(Required) Specifies the name of the Log Analytics Workspace. Changing this forces a new resource to be created."
   type        = string
 }
-
+// Why managed_?
 variable "managed_environment_name" {
   description = "(Required) The name of the container apps managed environment. Changing this forces a new resource to be created."
   type        = string
@@ -153,14 +164,14 @@ variable "daily_quota_gb" {
 
 variable "dapr_component" {
   description = "(Optional) The Dapr component to deploy."
-  type = set(object({
+  type        = map(object({
     name           = string
     component_type = string
     version        = string
     ignore_errors  = optional(bool, false)
     init_timeout   = optional(string, "5s")
     scopes         = optional(list(string))
-    metadata = optional(set(object({
+    metadata       = optional(set(object({
       name        = string
       secret_name = optional(string)
       value       = string

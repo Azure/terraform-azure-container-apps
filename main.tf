@@ -3,9 +3,12 @@ data "azurerm_resource_group" "azca" {
 }
 
 resource "azurerm_log_analytics_workspace" "laws" {
+  count = var.log_analytics_workspace == null ? 1 : 0
+
   location                           = coalesce(var.location, data.azurerm_resource_group.azca.location)
   name                               = var.log_analytics_workspace_name
   resource_group_name                = var.resource_group_name
+  // variable prefix?
   allow_resource_only_permissions    = var.allow_resource_only_permissions
   cmk_for_query_forced               = var.cmk_for_query_forced
   daily_quota_gb                     = var.daily_quota_gb
@@ -18,11 +21,25 @@ resource "azurerm_log_analytics_workspace" "laws" {
   tags                               = var.log_analytics_workspace_tags
 }
 
-resource "azurerm_container_app_environment" "containerenv" {
+variable "log_analytics_workspace" {
+  type = object({
+    id = string
+  })
+  default = null
+}
+
+resource "null_resource" "env_tags_keeper" {
+  triggers = {
+    tags = var.environment_tags
+  }
+}
+
+resource "azurerm_container_app_environment" "container_env" {
   location                       = coalesce(var.location, data.azurerm_resource_group.azca.location)
-  log_analytics_workspace_id     = azurerm_log_analytics_workspace.laws.id
+  log_analytics_workspace_id     = try(azurerm_log_analytics_workspace.laws[0].id, var.log_analytics_workspace.id)
   name                           = var.managed_environment_name
   resource_group_name            = var.resource_group_name
+  // variable name prefix
   infrastructure_subnet_id       = var.infrastructure_subnet_id
   internal_load_balancer_enabled = var.internal_load_balancer_enabled
   tags                           = var.environment_tags
@@ -34,12 +51,22 @@ resource "azurerm_container_app_environment" "containerenv" {
   }
 }
 
+resource "azapi_update_resource" "env_tags" {
+  type = ""
+
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.env_tags_keeper
+    ]
+  }
+}
+
 resource "azurerm_container_app_environment_dapr_component" "dapr" {
-  for_each = { for component in var.dapr_component : component.name => component }
+  for_each = var.dapr_component
 
   component_type               = each.value.component_type
-  container_app_environment_id = azurerm_container_app_environment.containerenv.id
-  name                         = each.key
+  container_app_environment_id = azurerm_container_app_environment.container_env.id
+  name                         = each.value.name
   version                      = each.value.version
   ignore_errors                = each.value.ignore_errors
   init_timeout                 = each.value.init_timeout
@@ -64,11 +91,11 @@ resource "azurerm_container_app_environment_dapr_component" "dapr" {
   }
 }
 
-resource "azurerm_container_app" "containerapp" {
-  for_each = { for app in var.container_apps : app.name => app }
+resource "azurerm_container_app" "container_app" {
+  for_each = var.container_apps
 
-  container_app_environment_id = azurerm_container_app_environment.containerenv.id
-  name                         = each.key
+  container_app_environment_id = azurerm_container_app_environment.container_env.id
+  name                         = each.value.name
   resource_group_name          = var.resource_group_name
   revision_mode                = each.value.revision_mode
   tags                         = each.value.tags
@@ -235,6 +262,7 @@ resource "azurerm_container_app" "containerapp" {
 
   lifecycle {
     ignore_changes = [
+      // could we make tags updatable?
       tags
     ]
   }
