@@ -8,61 +8,30 @@ resource "azurerm_log_analytics_workspace" "laws" {
   location                           = coalesce(var.location, data.azurerm_resource_group.azca.location)
   name                               = var.log_analytics_workspace_name
   resource_group_name                = var.resource_group_name
-  // variable prefix?
-  allow_resource_only_permissions    = var.allow_resource_only_permissions
-  cmk_for_query_forced               = var.cmk_for_query_forced
-  daily_quota_gb                     = var.daily_quota_gb
-  internet_ingestion_enabled         = var.internet_ingestion_enabled
-  internet_query_enabled             = var.internet_query_enabled
-  local_authentication_disabled      = var.local_authentication_disabled
-  reservation_capacity_in_gb_per_day = var.reservation_capacity_in_gb_per_day
-  retention_in_days                  = var.retention_in_days
+  allow_resource_only_permissions    = var.log_analytics_workspace_allow_resource_only_permissions
+  cmk_for_query_forced               = var.log_analytics_workspace_cmk_for_query_forced
+  daily_quota_gb                     = var.log_analytics_workspace_daily_quota_gb
+  internet_ingestion_enabled         = var.log_analytics_workspace_internet_ingestion_enabled
+  internet_query_enabled             = var.log_analytics_workspace_internet_query_enabled
+  local_authentication_disabled      = var.log_analytics_workspace_local_authentication_disabled
+  reservation_capacity_in_gb_per_day = var.log_analytics_workspace_reservation_capacity_in_gb_per_day
+  retention_in_days                  = var.log_analytics_workspace_retention_in_days
   sku                                = var.log_analytics_workspace_sku
   tags                               = var.log_analytics_workspace_tags
-}
-
-variable "log_analytics_workspace" {
-  type = object({
-    id = string
-  })
-  default = null
-}
-
-resource "null_resource" "env_tags_keeper" {
-  triggers = {
-    tags = var.environment_tags
-  }
 }
 
 resource "azurerm_container_app_environment" "container_env" {
   location                       = coalesce(var.location, data.azurerm_resource_group.azca.location)
   log_analytics_workspace_id     = try(azurerm_log_analytics_workspace.laws[0].id, var.log_analytics_workspace.id)
-  name                           = var.managed_environment_name
+  name                           = var.container_app_environment_name
   resource_group_name            = var.resource_group_name
-  // variable name prefix
-  infrastructure_subnet_id       = var.infrastructure_subnet_id
-  internal_load_balancer_enabled = var.internal_load_balancer_enabled
-  tags                           = var.environment_tags
-
-  lifecycle {
-    ignore_changes = [
-      tags
-    ]
-  }
-}
-
-resource "azapi_update_resource" "env_tags" {
-  type = ""
-
-  lifecycle {
-    replace_triggered_by = [
-      null_resource.env_tags_keeper
-    ]
-  }
+  infrastructure_subnet_id       = var.container_app_environment_infrastructure_subnet_id
+  internal_load_balancer_enabled = var.container_app_environment_internal_load_balancer_enabled
+  tags                           = var.container_app_environment_tags
 }
 
 resource "azurerm_container_app_environment_dapr_component" "dapr" {
-  for_each = var.dapr_component
+  for_each = var.dapr_component == null ? tomap({}) : var.dapr_component
 
   component_type               = each.value.component_type
   container_app_environment_id = azurerm_container_app_environment.container_env.id
@@ -82,7 +51,7 @@ resource "azurerm_container_app_environment_dapr_component" "dapr" {
     }
   }
   dynamic "secret" {
-    for_each = each.value.secret == null ? [] : each.value.secret
+    for_each = try(var.dapr_component_secrets[each.key], null) == null ? [] : var.dapr_component_secrets[each.key]
 
     content {
       name  = secret.value.name
@@ -252,18 +221,11 @@ resource "azurerm_container_app" "container_app" {
     }
   }
   dynamic "secret" {
-    for_each = each.value.secret == null ? [] : [each.value.secret]
+    for_each = try(var.container_app_secrets[each.key], null) == null ? [] : var.container_app_secrets[each.key]
 
     content {
       name  = secret.value.name
       value = secret.value.value
     }
-  }
-
-  lifecycle {
-    ignore_changes = [
-      // could we make tags updatable?
-      tags
-    ]
   }
 }

@@ -12,13 +12,13 @@ resource "azurerm_resource_group" "test" {
 }
 
 module "containerapps" {
-  source                   = "../.."
-  resource_group_name      = azurerm_resource_group.test.name
-  location                 = var.location
-  managed_environment_name = "example-env-${random_id.env_name.hex}"
+  source                         = "../.."
+  resource_group_name            = azurerm_resource_group.test.name
+  location                       = var.location
+  container_app_environment_name = "example-env-${random_id.env_name.hex}"
 
-  container_apps = [
-    {
+  container_apps = {
+    example = {
       name          = "example-container"
       revision_mode = "Single"
 
@@ -49,8 +49,10 @@ module "containerapps" {
         }
       }
     }
-  ]
+  }
   log_analytics_workspace_name = "testlaws"
+  container_app_secrets        = {}
+  dapr_component_secrets       = {}
 }
 
 resource "azurerm_container_app" "dashboard" {
@@ -72,7 +74,7 @@ resource "azurerm_container_app" "dashboard" {
       }
       env {
         name  = "COUNTING_SERVICE_URL"
-        value = module.containerapps.container_app_fqdn["example-container"]
+        value = module.containerapps.container_app_fqdn["example"]
       }
     }
   }
