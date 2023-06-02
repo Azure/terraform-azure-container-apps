@@ -111,15 +111,16 @@ variable "container_apps" {
     condition     = length(var.container_apps) >= 1
     error_message = "At least one container should be provided."
   }
+  nullable = false
 }
 
 variable "container_app_secrets" {
   description = "(Optional) The secrets of the container apps. The key of the map should be aligned with the corresponding container app."
-  type = map(list(object({
+  type = map(object({
     name  = string
     value = string
-  })))
-  nullable  = false
+  }))
+  default   = null
   sensitive = true
 }
 
@@ -171,16 +172,17 @@ variable "dapr_component" {
       value       = string
     })))
   }))
-  default = null
+  default  = {}
+  nullable = false
 }
 
 variable "dapr_component_secrets" {
   description = "(Optional) The secrets of the Dapr components. The key of the map should be aligned with the corresponding Dapr component."
-  type = map(list(object({
+  type = map(object({
     name  = string
     value = string
-  })))
-  nullable  = false
+  }))
+  default   = null
   sensitive = true
 }
 
