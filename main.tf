@@ -56,7 +56,7 @@ resource "azurerm_container_app_environment_dapr_component" "dapr" {
 
     content {
       name  = secret.key
-      value = [for pair in var.dapr_component_secrets[each.key] : pair.value if pair.name == secret.key]
+      value = [for pair in var.dapr_component_secrets[each.key] : pair.value if pair.name == secret.key][0]
     }
   }
 }
@@ -226,7 +226,7 @@ resource "azurerm_container_app" "container_app" {
 
     content {
       name  = secret.key
-      value = [for pair in var.container_app_secrets[each.key] : pair.value if pair.name == secret.key]
+      value = [for pair in var.container_app_secrets[each.key] : pair.value if pair.name == secret.key][0]
     }
   }
 }
