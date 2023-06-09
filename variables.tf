@@ -16,7 +16,7 @@ variable "container_apps" {
         env = optional(set(object({
           name        = string
           secret_name = optional(string)
-          value       = /*optional?*/ string
+          value       = optional(string)
         })))
         liveness_probe = optional(object({
           failure_count_threshold = optional(number)
@@ -116,11 +116,11 @@ variable "container_apps" {
 
 variable "container_app_secrets" {
   description = "(Optional) The secrets of the container apps. The key of the map should be aligned with the corresponding container app."
-  type = map(object({
+  type = map(list(object({
     name  = string
     value = string
-  }))
-  default   = null
+  })))
+  default   = {}
   sensitive = true
 }
 
@@ -178,11 +178,11 @@ variable "dapr_component" {
 
 variable "dapr_component_secrets" {
   description = "(Optional) The secrets of the Dapr components. The key of the map should be aligned with the corresponding Dapr component."
-  type = map(object({
+  type = map(list(object({
     name  = string
     value = string
-  }))
-  default   = null
+  })))
+  default   = {}
   sensitive = true
 }
 

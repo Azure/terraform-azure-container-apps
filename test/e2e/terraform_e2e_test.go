@@ -4,9 +4,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/gruntwork-io/terratest/modules/terraform"
-
 	test_helper "github.com/Azure/terraform-module-test-helper"
+	"github.com/gruntwork-io/terratest/modules/terraform"
 )
 
 func TestExamplesDapr(t *testing.T) {

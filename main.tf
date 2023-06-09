@@ -52,11 +52,11 @@ resource "azurerm_container_app_environment_dapr_component" "dapr" {
   }
 
   dynamic "secret" {
-    for_each = lookup(var.dapr_component_secrets, each.key, null) == null ? [] : [var.dapr_component_secrets[each.key]]
+    for_each = nonsensitive(toset([for pair in lookup(var.dapr_component_secrets, each.key, []) : pair.name]))
 
     content {
-      name  = secret.value.name
-      value = secret.value.value
+      name  = secret.key
+      value = [for pair in var.dapr_component_secrets[each.key] : pair.value if pair.name == secret.key]
     }
   }
 }
@@ -222,10 +222,11 @@ resource "azurerm_container_app" "container_app" {
     }
   }
   dynamic "secret" {
-    for_each = lookup(var.container_app_secrets, each.key, null) == null ? [] : [var.container_app_secrets[each.key]]
+    for_each = nonsensitive(toset([for pair in lookup(var.container_app_secrets, each.key, []) : pair.name]))
+
     content {
-      name  = secret.value.name
-      value = secret.value.value
+      name  = secret.key
+      value = [for pair in var.container_app_secrets[each.key] : pair.value if pair.name == secret.key]
     }
   }
 }

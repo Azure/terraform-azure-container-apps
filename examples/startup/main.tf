@@ -6,6 +6,10 @@ resource "random_id" "env_name" {
   byte_length = 8
 }
 
+resource "random_id" "container_name" {
+  byte_length = 4
+}
+
 resource "azurerm_resource_group" "test" {
   location = var.location
   name     = "example-container-app-${random_id.rg_name.hex}"
@@ -19,7 +23,7 @@ module "containerapps" {
 
   container_apps = {
     example = {
-      name          = "example-container"
+      name          = "example-container-${random_id.container_name.hex}"
       revision_mode = "Single"
 
       template = {
@@ -51,8 +55,6 @@ module "containerapps" {
     }
   }
   log_analytics_workspace_name = "testlaws"
-  container_app_secrets        = {}
-  dapr_component_secrets       = {}
 }
 
 resource "azurerm_container_app" "dashboard" {

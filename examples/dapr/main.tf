@@ -14,6 +14,10 @@ resource "random_id" "sa_name" {
   byte_length = 4
 }
 
+resource "random_id" "container_name" {
+  byte_length = 4
+}
+
 resource "azurerm_resource_group" "rg" {
   location = var.location
   name     = "rg-${random_id.rg_name.hex}"
@@ -62,7 +66,7 @@ resource "azurerm_key_vault_key" "test" {
   expiration_date = timeadd("${formatdate("YYYY-MM-DD", timestamp())}T00:00:00Z", "168h")
   key_size        = 2048
 
-  depends_on = [azurerm_key_vault_access_policy.client, azurerm_key_vault_access_policy.storage]
+  depends_on = [azurerm_key_vault_access_policy.client]
 
   lifecycle {
     ignore_changes = [expiration_date]
@@ -231,7 +235,7 @@ module "containerapps" {
 
   dapr_component = {
     statestore = {
-      name           = "statestore"
+      name           = "statestore-${random_id.container_name.hex}"
       component_type = "state.azure.blobstorage"
       version        = "v1"
       scopes         = ["nodeapp"]
@@ -253,7 +257,7 @@ module "containerapps" {
   }
   container_apps = {
     pythonapp = {
-      name          = "pythonapp"
+      name          = "pythonapp-${random_id.container_name.hex}"
       revision_mode = "Single"
 
       template = {
@@ -275,7 +279,7 @@ module "containerapps" {
       }
     },
     nodeapp = {
-      name          = "nodeapp"
+      name          = "nodeapp-${random_id.container_name.hex}"
       revision_mode = "Single"
 
       template = {
@@ -304,6 +308,4 @@ module "containerapps" {
       }
     }
   }
-  container_app_secrets  = {}
-  dapr_component_secrets = {}
 }
