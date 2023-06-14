@@ -1,11 +1,7 @@
-data "azurerm_resource_group" "azca" {
-  name = var.resource_group_name
-}
-
 resource "azurerm_log_analytics_workspace" "laws" {
   count = var.log_analytics_workspace == null ? 1 : 0
 
-  location                           = coalesce(var.location, data.azurerm_resource_group.azca.location)
+  location                           = var.location
   name                               = var.log_analytics_workspace_name
   resource_group_name                = var.resource_group_name
   allow_resource_only_permissions    = var.log_analytics_workspace_allow_resource_only_permissions
@@ -21,7 +17,7 @@ resource "azurerm_log_analytics_workspace" "laws" {
 }
 
 resource "azurerm_container_app_environment" "container_env" {
-  location                       = coalesce(var.location, data.azurerm_resource_group.azca.location)
+  location                       = var.location
   log_analytics_workspace_id     = try(azurerm_log_analytics_workspace.laws[0].id, var.log_analytics_workspace.id)
   name                           = var.container_app_environment_name
   resource_group_name            = var.resource_group_name
@@ -31,7 +27,7 @@ resource "azurerm_container_app_environment" "container_env" {
 }
 
 resource "azurerm_container_app_environment_dapr_component" "dapr" {
-  for_each = var.dapr_component == null ? tomap({}) : var.dapr_component
+  for_each = var.dapr_component
 
   component_type               = each.value.component_type
   container_app_environment_id = azurerm_container_app_environment.container_env.id
@@ -50,13 +46,12 @@ resource "azurerm_container_app_environment_dapr_component" "dapr" {
       value       = metadata.value.value
     }
   }
-
   dynamic "secret" {
     for_each = nonsensitive(toset([for pair in lookup(var.dapr_component_secrets, each.key, []) : pair.name]))
 
     content {
       name  = secret.key
-      value = [for pair in var.dapr_component_secrets[each.key] : pair.value if pair.name == secret.key][0]
+      value = local.dapr_component_secrets[each.key][secret.key]
     }
   }
 }
@@ -226,7 +221,7 @@ resource "azurerm_container_app" "container_app" {
 
     content {
       name  = secret.key
-      value = [for pair in var.container_app_secrets[each.key] : pair.value if pair.name == secret.key][0]
+      value = local.container_app_secrets[each.key][secret.key]
     }
   }
 }

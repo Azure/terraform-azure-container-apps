@@ -1,5 +1,10 @@
+variable "container_app_environment_name" {
+  type        = string
+  description = "(Required) The name of the container apps managed environment. Changing this forces a new resource to be created."
+  nullable    = false
+}
+
 variable "container_apps" {
-  description = "The container apps to deploy."
   type = map(object({
     name          = string
     tags          = optional(map(string))
@@ -106,59 +111,63 @@ variable "container_apps" {
       identity             = optional(string)
     })))
   }))
+  description = "The container apps to deploy."
+  nullable    = false
 
   validation {
     condition     = length(var.container_apps) >= 1
     error_message = "At least one container should be provided."
   }
-  nullable = false
+}
+
+variable "location" {
+  type        = string
+  description = "(Required) The location this container app is deployed in. This should be the same as the environment in which it is deployed."
+  nullable    = false
+}
+
+variable "log_analytics_workspace_name" {
+  type        = string
+  description = "(Required) Specifies the name of the Log Analytics Workspace. Changing this forces a new resource to be created."
+  nullable    = false
+}
+
+variable "resource_group_name" {
+  type        = string
+  description = "(Required) The name of the resource group in which the resources will be created."
+  nullable    = false
+}
+
+variable "container_app_environment_infrastructure_subnet_id" {
+  type        = string
+  default     = null
+  description = "(Optional) The existing subnet to use for the container apps control plane. Changing this forces a new resource to be created."
+}
+
+variable "container_app_environment_internal_load_balancer_enabled" {
+  type        = bool
+  default     = false
+  description = "(Optional) Should the Container Environment operate in Internal Load Balancing Mode? Defaults to `false`. Changing this forces a new resource to be created."
+}
+
+variable "container_app_environment_tags" {
+  type        = map(string)
+  default     = {}
+  description = "A map of the tags to use on the resources that are deployed with this module."
 }
 
 variable "container_app_secrets" {
-  description = "(Optional) The secrets of the container apps. The key of the map should be aligned with the corresponding container app."
   type = map(list(object({
     name  = string
     value = string
   })))
-  default   = {}
-  sensitive = true
-}
-
-variable "log_analytics_workspace_name" {
-  description = "(Required) Specifies the name of the Log Analytics Workspace. Changing this forces a new resource to be created."
-  type        = string
-}
-
-variable "container_app_environment_name" {
-  description = "(Required) The name of the container apps managed environment. Changing this forces a new resource to be created."
-  type        = string
-}
-
-variable "resource_group_name" {
-  description = "(Required) The name of the resource group in which the resources will be created."
-  type        = string
-}
-
-variable "log_analytics_workspace_allow_resource_only_permissions" {
-  description = "(Optional) Specifies if the log Analytics Workspace allow users accessing to data associated with resources they have permission to view, without permission to workspace. Defaults to `true`."
-  type        = bool
-  default     = true
-}
-
-variable "log_analytics_workspace_cmk_for_query_forced" {
-  description = "(Optional) Is Customer Managed Storage mandatory for query management? Defaults to `false`."
-  type        = bool
-  default     = false
-}
-
-variable "log_analytics_workspace_daily_quota_gb" {
-  description = "(Optional) The workspace daily quota for ingestion in GB. Defaults to `-1` which means unlimited."
-  type        = number
-  default     = -1
+  default     = {}
+  description = "(Optional) The secrets of the container apps. The key of the map should be aligned with the corresponding container app."
+  nullable    = false
+  sensitive   = true
 }
 
 variable "dapr_component" {
-  description = "(Optional) The Dapr component to deploy."
   type = map(object({
     name           = string
     component_type = string
@@ -172,93 +181,86 @@ variable "dapr_component" {
       value       = string
     })))
   }))
-  default  = {}
-  nullable = false
+  default     = {}
+  description = "(Optional) The Dapr component to deploy."
+  nullable    = false
 }
 
 variable "dapr_component_secrets" {
-  description = "(Optional) The secrets of the Dapr components. The key of the map should be aligned with the corresponding Dapr component."
   type = map(list(object({
     name  = string
     value = string
   })))
-  default   = {}
-  sensitive = true
-}
-
-variable "container_app_environment_tags" {
-  type        = map(string)
-  description = "A map of the tags to use on the resources that are deployed with this module."
-
-  default = {
-    source = "terraform"
-  }
-}
-
-variable "container_app_environment_infrastructure_subnet_id" {
-  description = "(Optional) The existing subnet to use for the container apps control plane. Changing this forces a new resource to be created."
-  type        = string
-  default     = null
-}
-
-variable "container_app_environment_internal_load_balancer_enabled" {
-  description = "(Optional) Should the Container Environment operate in Internal Load Balancing Mode? Defaults to `false`. Changing this forces a new resource to be created."
-  type        = bool
-  default     = false
-}
-
-variable "log_analytics_workspace_internet_ingestion_enabled" {
-  description = "(Optional) Should the Log Analytics Workspace support ingestion over the Public Internet? Defaults to `true`."
-  type        = bool
-  default     = true
-}
-
-variable "log_analytics_workspace_internet_query_enabled" {
-  description = "(Optional) Should the Log Analytics Workspace support query over the Public Internet? Defaults to `true`."
-  type        = bool
-  default     = true
-}
-
-variable "log_analytics_workspace_local_authentication_disabled" {
-  description = "(Optional) Specifies if the log analytics workspace should enforce authentication using Azure Active Directory. Defaults to `false`."
-  type        = bool
-  default     = false
-}
-
-variable "location" {
-  description = "(Required) The location this container app is deployed in. This should be the same as the environment in which it is deployed."
-  type        = string
-  default     = ""
+  default     = {}
+  description = "(Optional) The secrets of the Dapr components. The key of the map should be aligned with the corresponding Dapr component."
+  nullable    = false
+  sensitive   = true
 }
 
 variable "log_analytics_workspace" {
-  description = "(Optional) A Log Analytics Workspace already exists."
   type = object({
     id = string
   })
-  default = null
-}
-
-variable "log_analytics_workspace_sku" {
-  description = "(Optional) Specifies the SKU of the Log Analytics Workspace. Possible values are `Free`, `PerNode`, `Premium`, `Standard`, `Standalone`, `Unlimited`, `CapacityReservation`, and `PerGB2018`(new SKU as of `2018-04-03`). Defaults to `PerGB2018`. "
-  type        = string
-  default     = "PerGB2018"
-}
-
-variable "log_analytics_workspace_tags" {
-  description = "(Optional) A mapping of tags to assign to the resource."
-  type        = map(string)
   default     = null
+  description = "(Optional) A Log Analytics Workspace already exists."
+}
+
+variable "log_analytics_workspace_allow_resource_only_permissions" {
+  type        = bool
+  default     = true
+  description = "(Optional) Specifies if the log Analytics Workspace allow users accessing to data associated with resources they have permission to view, without permission to workspace. Defaults to `true`."
+}
+
+variable "log_analytics_workspace_cmk_for_query_forced" {
+  type        = bool
+  default     = false
+  description = "(Optional) Is Customer Managed Storage mandatory for query management? Defaults to `false`."
+}
+
+variable "log_analytics_workspace_daily_quota_gb" {
+  type        = number
+  default     = -1
+  description = "(Optional) The workspace daily quota for ingestion in GB. Defaults to `-1` which means unlimited."
+}
+
+variable "log_analytics_workspace_internet_ingestion_enabled" {
+  type        = bool
+  default     = true
+  description = "(Optional) Should the Log Analytics Workspace support ingestion over the Public Internet? Defaults to `true`."
+}
+
+variable "log_analytics_workspace_internet_query_enabled" {
+  type        = bool
+  default     = true
+  description = "(Optional) Should the Log Analytics Workspace support query over the Public Internet? Defaults to `true`."
+}
+
+variable "log_analytics_workspace_local_authentication_disabled" {
+  type        = bool
+  default     = false
+  description = "(Optional) Specifies if the log analytics workspace should enforce authentication using Azure Active Directory. Defaults to `false`."
 }
 
 variable "log_analytics_workspace_reservation_capacity_in_gb_per_day" {
-  description = "(Optional) The capacity reservation level in GB for this workspace. Must be in increments of 100 between 100 and 5000. `reservation_capacity_in_gb_per_day` can only be used when the `sku` is set to `CapacityReservation`."
   type        = number
   default     = null
+  description = "(Optional) The capacity reservation level in GB for this workspace. Must be in increments of 100 between 100 and 5000. `reservation_capacity_in_gb_per_day` can only be used when the `sku` is set to `CapacityReservation`."
 }
 
 variable "log_analytics_workspace_retention_in_days" {
-  description = "(Optional) The workspace data retention in days. Possible values are either 7 (Free Tier only) or range between 30 and 730."
   type        = number
   default     = null
+  description = "(Optional) The workspace data retention in days. Possible values are either 7 (Free Tier only) or range between 30 and 730."
+}
+
+variable "log_analytics_workspace_sku" {
+  type        = string
+  default     = "PerGB2018"
+  description = "(Optional) Specifies the SKU of the Log Analytics Workspace. Possible values are `Free`, `PerNode`, `Premium`, `Standard`, `Standalone`, `Unlimited`, `CapacityReservation`, and `PerGB2018`(new SKU as of `2018-04-03`). Defaults to `PerGB2018`. "
+}
+
+variable "log_analytics_workspace_tags" {
+  type        = map(string)
+  default     = null
+  description = "(Optional) A mapping of tags to assign to the resource."
 }
