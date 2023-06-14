@@ -15,15 +15,15 @@ resource "azurerm_resource_group" "test" {
   name     = "example-container-app-${random_id.rg_name.hex}"
 }
 
-module "containerapps" {
+module "container_apps" {
   source                         = "../.."
   resource_group_name            = azurerm_resource_group.test.name
   location                       = var.location
   container_app_environment_name = "example-env-${random_id.env_name.hex}"
 
   container_apps = {
-    example = {
-      name          = "example-container-${random_id.container_name.hex}"
+    counting = {
+      name          = "counting-${random_id.container_name.hex}"
       revision_mode = "Single"
 
       template = {
@@ -39,7 +39,7 @@ module "containerapps" {
                 value = "9001"
               }
             ]
-          }
+          },
         ]
       }
 
@@ -52,47 +52,46 @@ module "containerapps" {
           percentage      = 100
         }
       }
-    }
+    },
+    dashboard = {
+      name          = "dashboard"
+      revision_mode = "Single"
+
+      template = {
+        containers = [
+          {
+            name   = "testdashboard"
+            memory = "1Gi"
+            cpu    = 0.5
+            image  = "docker.io/hashicorp/dashboard-service:0.0.4"
+            env = [
+              {
+                name  = "PORT"
+                value = "8080"
+              },
+              {
+                name  = "COUNTING_SERVICE_URL"
+                value = "https://counting-${random_id.container_name.hex}"
+              }
+            ]
+          },
+        ]
+      }
+
+      ingress = {
+        allow_insecure_connections = true
+        target_port                = 8080
+        external_enabled           = true
+
+        traffic_weight = {
+          latest_revision = true
+          percentage      = 100
+        }
+      }
+      identity = {
+        type = "SystemAssigned"
+      }
+    },
   }
   log_analytics_workspace_name = "testlaws"
-}
-
-resource "azurerm_container_app" "dashboard" {
-  container_app_environment_id = module.containerapps.container_app_environment_id
-  name                         = "dashboardtest"
-  resource_group_name          = azurerm_resource_group.test.name
-  revision_mode                = "Single"
-
-  template {
-    container {
-      name   = "testdashboard"
-      image  = "docker.io/hashicorp/dashboard-service:0.0.4"
-      cpu    = 0.5
-      memory = "1Gi"
-
-      env {
-        name  = "PORT"
-        value = "8080"
-      }
-      env {
-        name  = "COUNTING_SERVICE_URL"
-        value = module.containerapps.container_app_fqdn["example"]
-      }
-    }
-  }
-
-  ingress {
-    allow_insecure_connections = true
-    target_port                = 8080
-    external_enabled           = true
-
-    traffic_weight {
-      latest_revision = true
-      percentage      = 100
-    }
-  }
-
-  identity {
-    type = "SystemAssigned"
-  }
 }
