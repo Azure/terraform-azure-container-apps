@@ -15,6 +15,11 @@ resource "azurerm_resource_group" "test" {
   name     = "example-container-app-${random_id.rg_name.hex}"
 }
 
+locals {
+  counting_app_name = "counting-${random_id.container_name.hex}"
+  dashboard_app_name = "dashboard-${random_id.container_name.hex}"
+}
+
 module "container_apps" {
   source                         = "../.."
   resource_group_name            = azurerm_resource_group.test.name
@@ -23,7 +28,7 @@ module "container_apps" {
 
   container_apps = {
     counting = {
-      name          = "counting-${random_id.container_name.hex}"
+      name          = local.counting_app_name
       revision_mode = "Single"
 
       template = {
@@ -54,7 +59,7 @@ module "container_apps" {
       }
     },
     dashboard = {
-      name          = "dashboard"
+      name          = local.dashboard_app_name
       revision_mode = "Single"
 
       template = {
@@ -71,7 +76,7 @@ module "container_apps" {
               },
               {
                 name  = "COUNTING_SERVICE_URL"
-                value = "https://counting-${random_id.container_name.hex}"
+                value = "http://${local.counting_app_name}"
               }
             ]
           },
@@ -79,7 +84,7 @@ module "container_apps" {
       }
 
       ingress = {
-        allow_insecure_connections = true
+        allow_insecure_connections = false
         target_port                = 8080
         external_enabled           = true
 
