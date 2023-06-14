@@ -16,7 +16,7 @@ resource "azurerm_resource_group" "test" {
 }
 
 locals {
-  counting_app_name = "counting-${random_id.container_name.hex}"
+  counting_app_name  = "counting-${random_id.container_name.hex}"
   dashboard_app_name = "dashboard-${random_id.container_name.hex}"
 }
 
