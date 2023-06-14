@@ -1,6 +1,6 @@
 variable "container_apps" {
   description = "The container apps to deploy."
-  type = set(object({
+  type = map(object({
     name          = string
     tags          = optional(map(string))
     revision_mode = string
@@ -16,7 +16,7 @@ variable "container_apps" {
         env = optional(set(object({
           name        = string
           secret_name = optional(string)
-          value       = string
+          value       = optional(string)
         })))
         liveness_probe = optional(object({
           failure_count_threshold = optional(number)
@@ -105,17 +105,23 @@ variable "container_apps" {
       password_secret_name = optional(string)
       identity             = optional(string)
     })))
-
-    secret = optional(list(object({
-      name  = string
-      value = string
-    })))
   }))
 
   validation {
     condition     = length(var.container_apps) >= 1
     error_message = "At least one container should be provided."
   }
+  nullable = false
+}
+
+variable "container_app_secrets" {
+  description = "(Optional) The secrets of the container apps. The key of the map should be aligned with the corresponding container app."
+  type = map(list(object({
+    name  = string
+    value = string
+  })))
+  default   = {}
+  sensitive = true
 }
 
 variable "log_analytics_workspace_name" {
@@ -123,7 +129,7 @@ variable "log_analytics_workspace_name" {
   type        = string
 }
 
-variable "managed_environment_name" {
+variable "container_app_environment_name" {
   description = "(Required) The name of the container apps managed environment. Changing this forces a new resource to be created."
   type        = string
 }
@@ -133,19 +139,19 @@ variable "resource_group_name" {
   type        = string
 }
 
-variable "allow_resource_only_permissions" {
+variable "log_analytics_workspace_allow_resource_only_permissions" {
   description = "(Optional) Specifies if the log Analytics Workspace allow users accessing to data associated with resources they have permission to view, without permission to workspace. Defaults to `true`."
   type        = bool
   default     = true
 }
 
-variable "cmk_for_query_forced" {
+variable "log_analytics_workspace_cmk_for_query_forced" {
   description = "(Optional) Is Customer Managed Storage mandatory for query management? Defaults to `false`."
   type        = bool
   default     = false
 }
 
-variable "daily_quota_gb" {
+variable "log_analytics_workspace_daily_quota_gb" {
   description = "(Optional) The workspace daily quota for ingestion in GB. Defaults to `-1` which means unlimited."
   type        = number
   default     = -1
@@ -153,7 +159,7 @@ variable "daily_quota_gb" {
 
 variable "dapr_component" {
   description = "(Optional) The Dapr component to deploy."
-  type = set(object({
+  type = map(object({
     name           = string
     component_type = string
     version        = string
@@ -165,15 +171,22 @@ variable "dapr_component" {
       secret_name = optional(string)
       value       = string
     })))
-    secret = optional(set(object({
-      name  = string
-      value = string
-    })))
   }))
-  default = null
+  default  = {}
+  nullable = false
 }
 
-variable "environment_tags" {
+variable "dapr_component_secrets" {
+  description = "(Optional) The secrets of the Dapr components. The key of the map should be aligned with the corresponding Dapr component."
+  type = map(list(object({
+    name  = string
+    value = string
+  })))
+  default   = {}
+  sensitive = true
+}
+
+variable "container_app_environment_tags" {
   type        = map(string)
   description = "A map of the tags to use on the resources that are deployed with this module."
 
@@ -182,31 +195,31 @@ variable "environment_tags" {
   }
 }
 
-variable "infrastructure_subnet_id" {
+variable "container_app_environment_infrastructure_subnet_id" {
   description = "(Optional) The existing subnet to use for the container apps control plane. Changing this forces a new resource to be created."
   type        = string
   default     = null
 }
 
-variable "internal_load_balancer_enabled" {
+variable "container_app_environment_internal_load_balancer_enabled" {
   description = "(Optional) Should the Container Environment operate in Internal Load Balancing Mode? Defaults to `false`. Changing this forces a new resource to be created."
   type        = bool
   default     = false
 }
 
-variable "internet_ingestion_enabled" {
+variable "log_analytics_workspace_internet_ingestion_enabled" {
   description = "(Optional) Should the Log Analytics Workspace support ingestion over the Public Internet? Defaults to `true`."
   type        = bool
   default     = true
 }
 
-variable "internet_query_enabled" {
+variable "log_analytics_workspace_internet_query_enabled" {
   description = "(Optional) Should the Log Analytics Workspace support query over the Public Internet? Defaults to `true`."
   type        = bool
   default     = true
 }
 
-variable "local_authentication_disabled" {
+variable "log_analytics_workspace_local_authentication_disabled" {
   description = "(Optional) Specifies if the log analytics workspace should enforce authentication using Azure Active Directory. Defaults to `false`."
   type        = bool
   default     = false
@@ -216,6 +229,14 @@ variable "location" {
   description = "(Required) The location this container app is deployed in. This should be the same as the environment in which it is deployed."
   type        = string
   default     = ""
+}
+
+variable "log_analytics_workspace" {
+  description = "(Optional) A Log Analytics Workspace already exists."
+  type = object({
+    id = string
+  })
+  default = null
 }
 
 variable "log_analytics_workspace_sku" {
@@ -230,13 +251,13 @@ variable "log_analytics_workspace_tags" {
   default     = null
 }
 
-variable "reservation_capacity_in_gb_per_day" {
+variable "log_analytics_workspace_reservation_capacity_in_gb_per_day" {
   description = "(Optional) The capacity reservation level in GB for this workspace. Must be in increments of 100 between 100 and 5000. `reservation_capacity_in_gb_per_day` can only be used when the `sku` is set to `CapacityReservation`."
   type        = number
   default     = null
 }
 
-variable "retention_in_days" {
+variable "log_analytics_workspace_retention_in_days" {
   description = "(Optional) The workspace data retention in days. Possible values are either 7 (Free Tier only) or range between 30 and 730."
   type        = number
   default     = null

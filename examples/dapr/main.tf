@@ -14,6 +14,10 @@ resource "random_id" "sa_name" {
   byte_length = 4
 }
 
+resource "random_id" "container_name" {
+  byte_length = 4
+}
+
 resource "azurerm_resource_group" "rg" {
   location = var.location
   name     = "rg-${random_id.rg_name.hex}"
@@ -48,14 +52,25 @@ resource "azurerm_key_vault" "test" {
 }
 
 resource "azurerm_key_vault_key" "test" {
-  key_opts        = ["decrypt", "encrypt", "sign", "unwrapKey", "verify", "wrapKey"]
+  key_opts = [
+    "decrypt",
+    "encrypt",
+    "sign",
+    "unwrapKey",
+    "verify",
+    "wrapKey"
+  ]
   key_type        = "RSA-HSM"
   key_vault_id    = azurerm_key_vault.test.id
   name            = "testkey"
-  expiration_date = "2025-01-02T15:04:05Z"
+  expiration_date = timeadd("${formatdate("YYYY-MM-DD", timestamp())}T00:00:00Z", "168h")
   key_size        = 2048
 
-  depends_on = [azurerm_key_vault_access_policy.client, azurerm_key_vault_access_policy.storage]
+  depends_on = [azurerm_key_vault_access_policy.client]
+
+  lifecycle {
+    ignore_changes = [expiration_date]
+  }
 }
 
 resource "azurerm_log_analytics_workspace" "test" {
@@ -67,22 +82,87 @@ resource "azurerm_log_analytics_workspace" "test" {
 }
 
 resource "azurerm_key_vault_access_policy" "storage" {
-  key_vault_id        = azurerm_key_vault.test.id
-  object_id           = azurerm_storage_account.test.identity[0].principal_id
-  tenant_id           = azurerm_storage_account.test.identity[0].tenant_id
-  key_permissions     = ["Get", "Create", "List", "Restore", "Recover", "UnwrapKey", "WrapKey", "Purge", "Encrypt", "Decrypt", "Sign", "Verify", "GetRotationPolicy", "SetRotationPolicy"]
-  secret_permissions  = ["Backup", "Delete", "Get", "List", "Purge", "Recover", "Restore", "Set"]
-  storage_permissions = ["Get", "List", "Set", "Update", "RegenerateKey", "Recover", "Purge"]
+  key_vault_id = azurerm_key_vault.test.id
+  object_id    = azurerm_storage_account.test.identity[0].principal_id
+  tenant_id    = azurerm_storage_account.test.identity[0].tenant_id
+  key_permissions = [
+    "Get",
+    "Create",
+    "List",
+    "Restore",
+    "Recover",
+    "UnwrapKey",
+    "WrapKey",
+    "Purge",
+    "Encrypt",
+    "Decrypt",
+    "Sign",
+    "Verify",
+    "GetRotationPolicy",
+    "SetRotationPolicy"
+  ]
+  secret_permissions = [
+    "Backup",
+    "Delete",
+    "Get",
+    "List",
+    "Purge",
+    "Recover",
+    "Restore",
+    "Set"
+  ]
+  storage_permissions = [
+    "Get",
+    "List",
+    "Set",
+    "Update",
+    "RegenerateKey",
+    "Recover",
+    "Purge"
+  ]
 }
 
 resource "azurerm_key_vault_access_policy" "client" {
   key_vault_id = azurerm_key_vault.test.id
-  object_id    = data.azurerm_client_config.current.object_id
+  object_id    = coalesce(var.managed_identity_principal_id, data.azurerm_client_config.current.object_id)
   tenant_id    = data.azurerm_client_config.current.tenant_id
 
-  key_permissions     = ["Get", "Create", "Delete", "List", "Restore", "Recover", "UnwrapKey", "WrapKey", "Purge", "Encrypt", "Decrypt", "Sign", "Verify", "GetRotationPolicy", "SetRotationPolicy"]
-  secret_permissions  = ["Backup", "Delete", "Get", "List", "Purge", "Recover", "Restore", "Set"]
-  storage_permissions = ["Get", "List", "Set", "Update", "RegenerateKey", "Recover", "Purge"]
+  key_permissions = [
+    "Get",
+    "Create",
+    "Delete",
+    "List",
+    "Restore",
+    "Recover",
+    "UnwrapKey",
+    "WrapKey",
+    "Purge",
+    "Encrypt",
+    "Decrypt",
+    "Sign",
+    "Verify",
+    "GetRotationPolicy",
+    "SetRotationPolicy"
+  ]
+  secret_permissions = [
+    "Backup",
+    "Delete",
+    "Get",
+    "List",
+    "Purge",
+    "Recover",
+    "Restore",
+    "Set"
+  ]
+  storage_permissions = [
+    "Get",
+    "List",
+    "Set",
+    "Update",
+    "RegenerateKey",
+    "Recover",
+    "Purge"
+  ]
 }
 
 resource "azurerm_storage_account" "test" {
@@ -99,7 +179,7 @@ resource "azurerm_storage_account" "test" {
   network_rules {
     default_action = "Deny"
     bypass         = ["AzureServices"]
-    ip_rules       = [local.public_ip, "0.0.0.0/0"]
+    ip_rules       = ["0.0.0.0/0"]
   }
   queue_properties {
     logging {
@@ -108,6 +188,9 @@ resource "azurerm_storage_account" "test" {
       version = "1.0"
       write   = true
     }
+  }
+  lifecycle {
+    ignore_changes = [customer_managed_key]
   }
 }
 
@@ -141,14 +224,18 @@ resource "azurerm_user_assigned_identity" "test" {
 }
 
 module "containerapps" {
-  source                       = "../.."
-  resource_group_name          = azurerm_resource_group.rg.name
-  location                     = azurerm_resource_group.rg.location
-  managed_environment_name     = "example-env-${random_id.env_name.hex}"
+  source                         = "../.."
+  resource_group_name            = azurerm_resource_group.rg.name
+  location                       = azurerm_resource_group.rg.location
+  container_app_environment_name = "example-env-${random_id.env_name.hex}"
+  container_app_environment_tags = {
+    environment = "test"
+  }
   log_analytics_workspace_name = "testlaworkspace"
-  dapr_component = [
-    {
-      name           = "statestore"
+
+  dapr_component = {
+    statestore = {
+      name           = "statestore-${random_id.container_name.hex}"
       component_type = "state.azure.blobstorage"
       version        = "v1"
       scopes         = ["nodeapp"]
@@ -167,10 +254,10 @@ module "containerapps" {
         }
       ]
     }
-  ]
-  container_apps = [
-    {
-      name          = "pythonapp"
+  }
+  container_apps = {
+    pythonapp = {
+      name          = "pythonapp-${random_id.container_name.hex}"
       revision_mode = "Single"
 
       template = {
@@ -187,9 +274,12 @@ module "containerapps" {
           }
         ]
       }
+      tags = {
+        "environment" = "dev"
+      }
     },
-    {
-      name          = "nodeapp"
+    nodeapp = {
+      name          = "nodeapp-${random_id.container_name.hex}"
       revision_mode = "Single"
 
       template = {
@@ -217,5 +307,5 @@ module "containerapps" {
         ]
       }
     }
-  ]
+  }
 }
