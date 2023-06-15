@@ -1,11 +1,11 @@
 # Changelog
 
-## [Unreleased](https://github.com/jiaweitao001/terraform-azurerm-container-apps/tree/HEAD)
+## [v0.1.0](https://github.com/Azure/terraform-azure-container-apps/tree/v0.1.0) (2023-06-14)
 
 **Merged pull requests:**
 
-- A pr contains some minor comments [\#12](https://github.com/jiaweitao001/terraform-azurerm-container-apps/pull/12) ([lonegunmanb](https://github.com/lonegunmanb))
-- review comments [\#11](https://github.com/jiaweitao001/terraform-azurerm-container-apps/pull/11) ([lonegunmanb](https://github.com/lonegunmanb))
+- A pr contains some minor comments [\#12](https://github.com/Azure/terraform-azure-container-apps/pull/12) ([lonegunmanb](https://github.com/lonegunmanb))
+- review comments [\#11](https://github.com/Azure/terraform-azure-container-apps/pull/11) ([lonegunmanb](https://github.com/lonegunmanb))
 
 
 
