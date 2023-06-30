@@ -169,7 +169,7 @@ resource "azurerm_container_app" "container_app" {
       }
     }
     dynamic "volume" {
-      for_each = each.value.template.volume == null ? [] : [each.value.template.volume]
+      for_each = each.value.template.volume == null ? [] : each.value.template.volume
 
       content {
         name         = volume.value.name

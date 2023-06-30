@@ -80,12 +80,7 @@ module "container_apps" {
               }
             ]
           },
-        ],
-        volume = {
-          name         = "testvolume"
-          storage_name = "teststorage"
-          storage_type = "AzureFile"
-        }
+        ]
       }
 
       ingress = {
