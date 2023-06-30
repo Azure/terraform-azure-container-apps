@@ -73,11 +73,11 @@ variable "container_apps" {
       min_replicas    = optional(number)
       revision_suffix = optional(string)
 
-      volume = optional(list(object({
+      volume = optional(object({
         name         = string
         storage_name = optional(string)
         storage_type = optional(string)
-      })))
+      }))
     })
 
     ingress = optional(object({
