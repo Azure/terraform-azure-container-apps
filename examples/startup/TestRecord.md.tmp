@@ -1,4 +1,4 @@
-## 25 Jun 23 00:40 UTC
+## 02 Jul 23 00:40 UTC
 
 Success: true
 
@@ -6,7 +6,7 @@ Success: true
 
 Terraform v1.5.0
 on linux_amd64
-+ provider registry.terraform.io/hashicorp/azurerm v3.62.1
++ provider registry.terraform.io/hashicorp/azurerm v3.63.0
 + provider registry.terraform.io/hashicorp/random v3.5.1
 
 ### Error
