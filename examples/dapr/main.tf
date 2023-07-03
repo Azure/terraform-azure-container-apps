@@ -66,7 +66,7 @@ resource "azurerm_key_vault_key" "test" {
   expiration_date = timeadd("${formatdate("YYYY-MM-DD", timestamp())}T00:00:00Z", "168h")
   key_size        = 2048
 
-  depends_on = [azurerm_key_vault_access_policy.client]
+  depends_on = [azurerm_key_vault_access_policy.client, azurerm_key_vault_access_policy.storage]
 
   lifecycle {
     ignore_changes = [expiration_date]
