@@ -208,6 +208,8 @@ resource "azurerm_storage_account_customer_managed_key" "managedkey" {
   key_vault_id       = azurerm_key_vault.test.id
   storage_account_id = azurerm_storage_account.test.id
   key_version        = azurerm_key_vault_key.test.version
+
+  depends_on = [azurerm_key_vault_access_policy.storage]
 }
 
 resource "azurerm_storage_container" "test" {
