@@ -1,6 +1,12 @@
 # Changelog
 
-## [v0.1.0](https://github.com/lonegunmanb/terraform-azure-container-app/tree/v0.1.0) (2023-06-14)
+## [Unreleased](https://github.com/Azure/terraform-azure-container-apps/tree/HEAD)
+
+**Merged pull requests:**
+
+- Fix dapr e2e test [\#6](https://github.com/Azure/terraform-azure-container-apps/pull/6) ([jiaweitao001](https://github.com/jiaweitao001))
+
+## [v0.1.0](https://github.com/Azure/terraform-azure-container-apps/tree/v0.1.0) (2023-06-14)
 
 
 
