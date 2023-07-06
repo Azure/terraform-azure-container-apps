@@ -56,6 +56,17 @@ resource "azurerm_container_app_environment_dapr_component" "dapr" {
   }
 }
 
+resource "azurerm_container_app_environment_storage" "storage" {
+  for_each = var.env_storage
+
+  container_app_environment_id = azurerm_container_app_environment.container_env.id
+  name                         = each.value.name
+  account_name                 = each.value.storage_account_name
+  access_key                   = each.value.access_key
+  share_name                   = each.value.share_name
+  access_mode                  = each.value.access_mode
+}
+
 resource "azurerm_container_app" "container_app" {
   for_each = var.container_apps
 
