@@ -198,15 +198,16 @@ variable "dapr_component_secrets" {
 }
 
 variable "env_storage" {
-  type = set(object({
+  type = map(object({
     name                 = string
     storage_account_name = string
     access_key           = string
     share_name           = string
     access_mode          = string
   }))
-  default     = []
-  description = "(Optional) The storage account to use for the environment."
+  default     = {}
+  description = "(Optional) Manages a Container App Environment Storage, writing files to this file share to make data accessible by other systems."
+  nullable    = false
 }
 
 variable "log_analytics_workspace" {
