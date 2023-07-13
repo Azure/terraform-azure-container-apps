@@ -57,13 +57,13 @@ resource "azurerm_container_app_environment_dapr_component" "dapr" {
 }
 
 resource "azurerm_container_app_environment_storage" "storage" {
-  for_each = var.env_storage
+  for_each = { for storage in var.env_storage : storage.name => storage }
 
-  access_key                   = each.value.access_key
+  access_key                   = var.environment_storage_access_key[each.key]
   access_mode                  = each.value.access_mode
   account_name                 = each.value.storage_account_name
   container_app_environment_id = azurerm_container_app_environment.container_env.id
-  name                         = each.value.name
+  name                         = each.key
   share_name                   = each.value.share_name
 }
 

@@ -201,13 +201,19 @@ variable "env_storage" {
   type = map(object({
     name                 = string
     storage_account_name = string
-    access_key           = string
     share_name           = string
     access_mode          = string
   }))
   default     = {}
   description = "(Optional) Manages a Container App Environment Storage, writing files to this file share to make data accessible by other systems."
   nullable    = false
+}
+
+variable "environment_storage_access_key" {
+  type        = map(string)
+  default     = null
+  description = "(Optional) The Storage Account Access Key. The key of the map should be aligned with the corresponding environment storage."
+  sensitive   = true
 }
 
 variable "log_analytics_workspace" {
