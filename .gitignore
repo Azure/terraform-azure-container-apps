@@ -29,6 +29,7 @@ Session.vim
 # temporary
 .netrwhist
 *~
+TestRecord/
 
 # auto-generated tag files
 tags
@@ -50,3 +51,4 @@ Gemfile.lock
 tfmod-scaffold
 README-generated.md
 scripts
+log
