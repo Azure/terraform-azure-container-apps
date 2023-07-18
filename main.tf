@@ -216,6 +216,16 @@ resource "azurerm_container_app" "container_app" {
       }
     }
   }
+  dynamic "registry" {
+    for_each = each.value.registry == null ? [] : each.value.registry
+
+    content {
+      server               = registry.value.server
+      identity             = registry.value.identity
+      password_secret_name = registry.value.password_secret_name
+      username             = registry.value.username
+    }
+  }
   dynamic "secret" {
     for_each = nonsensitive(toset([for pair in lookup(var.container_app_secrets, each.key, []) : pair.name]))
 

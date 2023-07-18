@@ -263,10 +263,6 @@ module "containerapps" {
       revision_mode = "Single"
 
       template = {
-        dapr = {
-          app_id   = "pythonapp"
-          app_port = 0
-        }
         containers = [
           {
             name   = "pythonapp"
@@ -275,6 +271,10 @@ module "containerapps" {
             memory = "0.5Gi"
           }
         ]
+      }
+      dapr = {
+        app_id   = "pythonapp"
+        app_port = 0
       }
       tags = {
         "environment" = "dev"
@@ -285,14 +285,6 @@ module "containerapps" {
       revision_mode = "Single"
 
       template = {
-        dapr = {
-          app_id   = "nodeapp"
-          app_port = 3000
-        }
-        identity = {
-          type                      = "UserAssigned"
-          user_assigned_identity_id = azurerm_user_assigned_identity.test.id
-        }
         containers = [
           {
             name   = "nodeapp"
@@ -307,6 +299,14 @@ module "containerapps" {
             ]
           }
         ]
+      }
+      dapr = {
+        app_id   = "nodeapp"
+        app_port = 3000
+      }
+      identity = {
+        type         = "UserAssigned"
+        identity_ids = [azurerm_user_assigned_identity.test.id]
       }
     }
   }
