@@ -4,6 +4,7 @@
 
 **Merged pull requests:**
 
+- Add `azurerm_container_app_environment_storage` to container apps module [\#8](https://github.com/Azure/terraform-azure-container-apps/pull/8) ([jiaweitao001](https://github.com/jiaweitao001))
 - Fix dapr e2e test [\#6](https://github.com/Azure/terraform-azure-container-apps/pull/6) ([jiaweitao001](https://github.com/jiaweitao001))
 - Fix container app volume variable's type [\#5](https://github.com/Azure/terraform-azure-container-apps/pull/5) ([jiaweitao001](https://github.com/jiaweitao001))
 
