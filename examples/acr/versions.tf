@@ -6,10 +6,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = ">= 3.11, < 4.0"
     }
-    curl = {
-      source  = "anschoewe/curl"
-      version = "1.0.2"
-    }
     docker = {
       source  = "kreuzwerker/docker"
       version = "3.0.2"
