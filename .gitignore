@@ -50,5 +50,9 @@ Gemfile.lock
 .tflint_example.hcl
 tfmod-scaffold
 README-generated.md
+**/override.tf
 scripts
 log
+
+/TestRecord
+**/TestRecord.md.tmp
