@@ -106,6 +106,8 @@ resource "azurerm_private_dns_a_record" "data" {
 }
 
 resource "azurerm_container_registry" "acr" {
+  #checkov:skip=CKV_AZURE_139: Public network access is required for the test
+  #checkov:skip=CKV_AZURE_166: Quarantine would block our test so we skip it
   location                      = azurerm_resource_group.test.location
   name                          = "acr${random_id.container_name.hex}"
   resource_group_name           = azurerm_resource_group.test.name

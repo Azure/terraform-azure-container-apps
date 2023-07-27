@@ -51,7 +51,7 @@ func TestExampleAcr(t *testing.T) {
 }
 
 func getHTML(url string) (string, error) {
-	resp, err := http.Get(url)
+	resp, err := http.Get(url) // #nosec G107
 	if err != nil {
 		return "", err
 	}
