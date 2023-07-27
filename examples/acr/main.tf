@@ -254,4 +254,5 @@ module "container_apps" {
       }
     ]
   }
+  depends_on = [null_resource.docker_push]
 }
