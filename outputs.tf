@@ -7,3 +7,8 @@ output "container_app_fqdn" {
   description = "The FQDN of the Latest Revision of the Container App."
   value       = { for name, container in azurerm_container_app.container_app : name => "https://${container.latest_revision_fqdn}" }
 }
+
+output "container_app_ips" {
+  description = "The IPs of the Latest Revision of the Container App."
+  value       = azurerm_container_app_environment.container_env.static_ip_address
+}

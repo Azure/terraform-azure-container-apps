@@ -8,20 +8,20 @@ A Terraform module to deploy a container app in Azure with the following charact
   - `name` - (Required) The name of the container.
   - `image` - (Required) The container image.
   - `resources` - (Optional) The resource requirements for the container.
-  - `ports` - (Optional) The ports exposed by the container. 
-  - `environment_variables` - (Optional) The environment variables for the container. 
+  - `ports` - (Optional) The ports exposed by the container.
+  - `environment_variables` - (Optional) The environment variables for the container.
   - `command` - (Optional) The command to run within the container in exec form.
   - `args` - (Optional) The arguments to the command in `command` field.
   - `liveness_probe` - (Optional) The liveness probe for the container.
   - `readiness_probe` - (Optional) The readiness probe for the container.
   - `volume_mounts` - (Optional) The volume mounts for the container.
   - `volumes` - (Optional) The volumes for the container.
-  - `secrets` - (Optional) The secrets for the container. 
-  - `image_pull_secrets` - (Optional) The image pull secrets for the container. 
-  - `security_context` - (Optional) The security context for the container. 
-  - `resources` - (Optional) The resource requirements for the container. 
-  - `ports` - (Optional) The ports exposed by the container. 
-  - `environment_variables` - (Optional) The environment variables for the container. 
+  - `secrets` - (Optional) The secrets for the container.
+  - `image_pull_secrets` - (Optional) The image pull secrets for the container.
+  - `security_context` - (Optional) The security context for the container.
+  - `resources` - (Optional) The resource requirements for the container.
+  - `ports` - (Optional) The ports exposed by the container.
+  - `environment_variables` - (Optional) The environment variables for the container.
   - `command` - (Optional) The command to run within the container in exec form.
   - `args` - (Optional) The arguments to the command in `command` field.
   - `liveness_probe` - (Optional) The liveness probe for the container.
@@ -173,4 +173,5 @@ No modules.
 |--------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
 | <a name="output_container_app_environment_id"></a> [container\_app\_environment\_id](#output\_container\_app\_environment\_id) | The ID of the Container App Environment within which this Container App should exist. |
 | <a name="output_container_app_fqdn"></a> [container\_app\_fqdn](#output\_container\_app\_fqdn)                                 | The FQDN of the Latest Revision of the Container App.                                 |
+| <a name="output_container_app_ips"></a> [container\_app\_ips](#output\_container\_app\_ips)                                    | The IPs of the Latest Revision of the Container App.                                  |
 <!-- END_TF_DOCS -->
