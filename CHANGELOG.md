@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased](https://github.com/Azure/terraform-azure-container-apps/tree/HEAD)
+
+**Merged pull requests:**
+
+- Bump github.com/Azure/terraform-module-test-helper from 0.12.0 to 0.15.0 in /test [\#13](https://github.com/Azure/terraform-azure-container-apps/pull/13) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v0.1.1](https://github.com/Azure/terraform-azure-container-apps/tree/v0.1.1) (2023-07-30)
 
 **Merged pull requests:**
