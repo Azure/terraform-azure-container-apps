@@ -4,8 +4,8 @@ output "container_app_environment_id" {
 }
 
 output "container_app_fqdn" {
-  description = "The FQDN of the Latest Revision of the Container App."
-  value       = { for name, container in azurerm_container_app.container_app : name => "https://${container.latest_revision_fqdn}" }
+  description = "The FQDN of the Container App's ingress."
+  value       = { for name, container in azurerm_container_app.container_app : name => "https://${container.ingress.fqdn}" }
 }
 
 output "container_app_ips" {

@@ -172,6 +172,6 @@ No modules.
 | Name                                                                                                                           | Description                                                                           |
 |--------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
 | <a name="output_container_app_environment_id"></a> [container\_app\_environment\_id](#output\_container\_app\_environment\_id) | The ID of the Container App Environment within which this Container App should exist. |
-| <a name="output_container_app_fqdn"></a> [container\_app\_fqdn](#output\_container\_app\_fqdn)                                 | The FQDN of the Latest Revision of the Container App.                                 |
+| <a name="output_container_app_fqdn"></a> [container\_app\_fqdn](#output\_container\_app\_fqdn)                                 | The FQDN of the Container App's ingress.                                              |
 | <a name="output_container_app_ips"></a> [container\_app\_ips](#output\_container\_app\_ips)                                    | The IPs of the Latest Revision of the Container App.                                  |
 <!-- END_TF_DOCS -->
