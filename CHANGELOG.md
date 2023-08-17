@@ -4,6 +4,7 @@
 
 **Merged pull requests:**
 
+- Bump github.com/Azure/terraform-module-test-helper from 0.15.0 to 0.16.0 in /test [\#17](https://github.com/Azure/terraform-azure-container-apps/pull/17) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Provide static IP as part of the outputs for non-custom domain support when using private VNET [\#16](https://github.com/Azure/terraform-azure-container-apps/pull/16) ([daconstenla](https://github.com/daconstenla))
 - Bump github.com/Azure/terraform-module-test-helper from 0.12.0 to 0.15.0 in /test [\#13](https://github.com/Azure/terraform-azure-container-apps/pull/13) ([dependabot[bot]](https://github.com/apps/dependabot))
 
