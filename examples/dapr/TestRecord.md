@@ -1,3 +1,21 @@
+## 20 Aug 23 00:34 UTC
+
+Success: true
+
+### Versions
+
+Terraform v1.5.3
+on linux_amd64
++ provider registry.terraform.io/anschoewe/curl v1.0.2
++ provider registry.terraform.io/hashicorp/azurerm v3.70.0
++ provider registry.terraform.io/hashicorp/random v3.5.1
+
+### Error
+
+
+
+---
+
 ## 15 Aug 23 00:21 UTC
 
 Success: true
