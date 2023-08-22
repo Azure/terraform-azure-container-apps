@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased](https://github.com/Azure/terraform-azure-container-apps/tree/HEAD)
+## [v0.2.0](https://github.com/Azure/terraform-azure-container-apps/tree/v0.2.0) (2023-08-21)
 
 **Merged pull requests:**
 
