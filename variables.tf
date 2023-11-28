@@ -4,6 +4,12 @@ variable "container_app_environment_name" {
   nullable    = false
 }
 
+variable "container_app_environment_resource_id" {
+  type        = string
+  description = "Reference to existing container apps environment to use."
+  default     = null
+}
+
 variable "container_apps" {
   type = map(object({
     name          = string
