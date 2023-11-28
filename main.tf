@@ -1,3 +1,7 @@
+locals {
+  container_app_environment_id = coalesce(var.container_app_environment_resource_id, azurerm_container_app_environment.container_env[0].id)
+}
+
 resource "azurerm_log_analytics_workspace" "laws" {
   count = var.log_analytics_workspace == null ? 1 : 0
 
@@ -17,6 +21,8 @@ resource "azurerm_log_analytics_workspace" "laws" {
 }
 
 resource "azurerm_container_app_environment" "container_env" {
+  count = var.container_app_environment_resource_id == null ? 1 : 0
+
   location                       = var.location
   log_analytics_workspace_id     = try(azurerm_log_analytics_workspace.laws[0].id, var.log_analytics_workspace.id)
   name                           = var.container_app_environment_name
@@ -30,7 +36,7 @@ resource "azurerm_container_app_environment_dapr_component" "dapr" {
   for_each = var.dapr_component
 
   component_type               = each.value.component_type
-  container_app_environment_id = azurerm_container_app_environment.container_env.id
+  container_app_environment_id = local.container_app_environment_id
   name                         = each.value.name
   version                      = each.value.version
   ignore_errors                = each.value.ignore_errors
@@ -62,7 +68,7 @@ resource "azurerm_container_app_environment_storage" "storage" {
   access_key                   = var.environment_storage_access_key[each.key]
   access_mode                  = each.value.access_mode
   account_name                 = each.value.account_name
-  container_app_environment_id = azurerm_container_app_environment.container_env.id
+  container_app_environment_id = local.container_app_environment_id
   name                         = each.value.name
   share_name                   = each.value.share_name
 }
@@ -70,7 +76,7 @@ resource "azurerm_container_app_environment_storage" "storage" {
 resource "azurerm_container_app" "container_app" {
   for_each = var.container_apps
 
-  container_app_environment_id = azurerm_container_app_environment.container_env.id
+  container_app_environment_id = local.container_app_environment_id
   name                         = each.value.name
   resource_group_name          = var.resource_group_name
   revision_mode                = each.value.revision_mode
