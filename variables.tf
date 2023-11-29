@@ -4,8 +4,10 @@ variable "container_app_environment_name" {
   nullable    = false
 }
 
-variable "container_app_environment_resource_id" {
-  type        = string
+variable "container_app_environment" {
+  type = object({
+    id = string
+  })
   description = "Reference to existing container apps environment to use."
   default     = null
 }
