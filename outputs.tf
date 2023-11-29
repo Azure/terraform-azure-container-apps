@@ -1,6 +1,6 @@
 output "container_app_environment_id" {
   description = "The ID of the Container App Environment within which this Container App should exist."
-  value       = azurerm_container_app_environment.container_env.id
+  value       = try(azurerm_container_app_environment.container_env[0].id, var.container_app_environment.id)
 }
 
 output "container_app_fqdn" {
@@ -10,5 +10,5 @@ output "container_app_fqdn" {
 
 output "container_app_ips" {
   description = "The IPs of the Latest Revision of the Container App."
-  value       = azurerm_container_app_environment.container_env.static_ip_address
+  value       = try(azurerm_container_app_environment.container_env[0].static_ip_address, null)
 }

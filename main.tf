@@ -1,5 +1,5 @@
 locals {
-  container_app_environment_id = coalesce(var.container_app_environment_resource_id, azurerm_container_app_environment.container_env[0].id)
+  container_app_environment_id = coalesce(var.container_app_environment.id, try(azurerm_container_app_environment.container_env[0].id, null))
 }
 
 resource "azurerm_log_analytics_workspace" "laws" {
@@ -21,7 +21,7 @@ resource "azurerm_log_analytics_workspace" "laws" {
 }
 
 resource "azurerm_container_app_environment" "container_env" {
-  count = var.container_app_environment_resource_id == null ? 1 : 0
+  count = var.container_app_environment == null ? 1 : 0
 
   location                       = var.location
   log_analytics_workspace_id     = try(azurerm_log_analytics_workspace.laws[0].id, var.log_analytics_workspace.id)
