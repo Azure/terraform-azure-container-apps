@@ -1,5 +1,5 @@
 locals {
-  container_app_environment_id = coalesce(var.container_app_environment.id, try(azurerm_container_app_environment.container_env[0].id, null))
+  container_app_environment_id = try(var.container_app_environment.id, azurerm_container_app_environment.container_env[0].id)
 }
 
 resource "azurerm_log_analytics_workspace" "laws" {
