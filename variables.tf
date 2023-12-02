@@ -10,6 +10,10 @@ variable "container_app_environment" {
   })
   description = "Reference to existing container apps environment to use."
   default     = null
+  validation {
+    condition     = var.container_app_environment.id != null
+    error_message = "`id` cannot be null"
+  }
 }
 
 variable "container_apps" {
