@@ -1,6 +1,6 @@
 output "container_app_environment_id" {
   description = "The ID of the Container App Environment within which this Container App should exist."
-  value       = try(azurerm_container_app_environment.container_env[0].id, var.container_app_environment.id)
+  value       = local.container_app_environment_id
 }
 
 output "container_app_fqdn" {
