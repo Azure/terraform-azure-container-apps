@@ -20,29 +20,10 @@ locals {
   dashboard_app_name = "dashboard-${random_id.container_name.hex}"
 }
 
-resource "azapi_resource" "container_apps_environment" {
-  type = "Microsoft.App/managedEnvironments@2023-05-01"
-
-  parent_id = azurerm_resource_group.test.id
-  name      = "test-env"
-  location  = azurerm_resource_group.test.location
-
-  body = jsonencode({
-    properties = {
-      workloadProfiles = [
-        {
-          name                = "Consumption"
-          workloadProfileType = "Consumption"
-        }
-      ]
-    }
-  })
-  ignore_missing_property   = true
-  schema_validation_enabled = true
-  response_export_values = [
-    "properties.staticIp",
-    "properties.defaultDomain"
-  ]
+resource "azurerm_container_app_environment" "this" {
+  name                = "test-env"
+  resource_group_name = azurerm_resource_group.test.name
+  location            = azurerm_resource_group.test.location
 }
 
 module "container_apps" {
@@ -52,7 +33,7 @@ module "container_apps" {
   container_app_environment_name = "example-env-${random_id.env_name.hex}"
 
   container_app_environment = {
-    id = azapi_resource.container_apps_environment.id
+    id = azurerm_container_app_environment.this.id
   }
 
   container_apps = {
