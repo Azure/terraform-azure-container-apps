@@ -33,7 +33,8 @@ module "container_apps" {
   container_app_environment_name = "example-env-${random_id.env_name.hex}"
 
   container_app_environment = {
-    id = azurerm_container_app_environment.this.id
+    name                = azurerm_container_app_environment.this.name
+    resource_group_name = azurerm_container_app_environment.this.resource_group_name
   }
 
   container_apps = {

@@ -1,5 +1,5 @@
 locals {
-  container_app_environment_id = try(var.container_app_environment.id, azurerm_container_app_environment.container_env[0].id)
+  container_app_environment_id = try(data.azurerm_container_app_environment.container_env.id, azurerm_container_app_environment.container_env[0].id)
 }
 
 resource "azurerm_log_analytics_workspace" "laws" {
@@ -18,6 +18,13 @@ resource "azurerm_log_analytics_workspace" "laws" {
   retention_in_days                  = var.log_analytics_workspace_retention_in_days
   sku                                = var.log_analytics_workspace_sku
   tags                               = var.log_analytics_workspace_tags
+}
+
+data "azurerm_container_app_environment" "container_env" {
+  count = var.container_app_environment != null ? 1 : 0
+
+  name                = var.container_app_environment.name
+  resource_group_name = var.container_app_environment.resource_group_name
 }
 
 resource "azurerm_container_app_environment" "container_env" {
