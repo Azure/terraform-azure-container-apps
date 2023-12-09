@@ -6,13 +6,14 @@ variable "container_app_environment_name" {
 
 variable "container_app_environment" {
   type = object({
-    id = string
+    name                = string
+    resource_group_name = string
   })
   description = "Reference to existing container apps environment to use."
   default     = null
   validation {
-    condition     = var.container_app_environment == null ? true : var.container_app_environment.id != null
-    error_message = "`id` cannot be null"
+    condition     = var.container_app_environment == null ? true : var.container_app_environment.name != null && var.container_app_environment.resource_group_name != null
+    error_message = "`name` and `resource_group_name` cannot be null"
   }
 }
 
