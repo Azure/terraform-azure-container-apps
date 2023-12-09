@@ -10,5 +10,5 @@ output "container_app_fqdn" {
 
 output "container_app_ips" {
   description = "The IPs of the Latest Revision of the Container App."
-  value       = try(azurerm_container_app_environment.container_env[0].static_ip_address, data.azurerm_container_app_environment.container_env.static_ip_address)
+  value       = try(azurerm_container_app_environment.container_env[0].static_ip_address, data.azurerm_container_app_environment.container_env[0].static_ip_address)
 }
