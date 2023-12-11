@@ -30,7 +30,7 @@ module "container_apps" {
   source                         = "../.."
   resource_group_name            = azurerm_resource_group.test.name
   location                       = var.location
-  container_app_environment_name = "example-env-${random_id.env_name.hex}"
+  container_app_environment_name = azurerm_container_app_environment.this.name
 
   container_app_environment = {
     name                = azurerm_container_app_environment.this.name
