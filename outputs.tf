@@ -12,3 +12,8 @@ output "container_app_ips" {
   description = "The IPs of the Latest Revision of the Container App."
   value       = try(azurerm_container_app_environment.container_env[0].static_ip_address, data.azurerm_container_app_environment.container_env[0].static_ip_address)
 }
+
+output "identity_ids" {
+  description = "The identities of the Container App."
+  value       = { for name, container in azurerm_container_app.container_app : name => container.identity }
+}
