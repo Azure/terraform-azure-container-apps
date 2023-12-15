@@ -18,11 +18,11 @@ resource "azurerm_log_analytics_workspace" "laws" {
 
 resource "azurerm_container_app_environment" "container_env" {
   location                       = var.location
-  log_analytics_workspace_id     = try(azurerm_log_analytics_workspace.laws[0].id, var.log_analytics_workspace.id)
   name                           = var.container_app_environment_name
   resource_group_name            = var.resource_group_name
   infrastructure_subnet_id       = var.container_app_environment_infrastructure_subnet_id
   internal_load_balancer_enabled = var.container_app_environment_internal_load_balancer_enabled
+  log_analytics_workspace_id     = try(azurerm_log_analytics_workspace.laws[0].id, var.log_analytics_workspace.id)
   tags                           = var.container_app_environment_tags
 }
 
