@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased](https://github.com/Azure/terraform-azure-container-apps/tree/HEAD)
+
+**Merged pull requests:**
+
+- Update default value for container\_app\_environment\_internal\_load\_balancer\_enabled [\#39](https://github.com/Azure/terraform-azure-container-apps/pull/39) ([abossard](https://github.com/abossard))
+
 ## [v0.2.0](https://github.com/Azure/terraform-azure-container-apps/tree/v0.2.0) (2023-08-21)
 
 **Merged pull requests:**
