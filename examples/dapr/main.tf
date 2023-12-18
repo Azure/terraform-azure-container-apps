@@ -233,6 +233,9 @@ module "containerapps" {
   container_app_environment_tags = {
     environment = "test"
   }
+  log_analytics_workspace = {
+    id = azurerm_log_analytics_workspace.test.id
+  }
   log_analytics_workspace_name = "testlaworkspace"
 
   dapr_component = {
