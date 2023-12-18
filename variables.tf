@@ -126,12 +126,6 @@ variable "location" {
   nullable    = false
 }
 
-variable "log_analytics_workspace_name" {
-  type        = string
-  description = "(Required) Specifies the name of the Log Analytics Workspace. Changing this forces a new resource to be created."
-  nullable    = false
-}
-
 variable "resource_group_name" {
   type        = string
   description = "(Required) The name of the resource group in which the resources will be created."
@@ -258,6 +252,12 @@ variable "log_analytics_workspace_local_authentication_disabled" {
   type        = bool
   default     = false
   description = "(Optional) Specifies if the log analytics workspace should enforce authentication using Azure Active Directory. Defaults to `false`."
+}
+
+variable "log_analytics_workspace_name" {
+  type        = string
+  default     = null
+  description = "(Optional) Specifies the name of the Log Analytics Workspace. Must set this variable if `var.log_analytics_workspace` is `null`. Changing this forces a new resource to be created."
 }
 
 variable "log_analytics_workspace_reservation_capacity_in_gb_per_day" {
