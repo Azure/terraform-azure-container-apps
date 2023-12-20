@@ -137,11 +137,13 @@ No modules.
 | [azurerm_container_app_environment_dapr_component.dapr](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment_dapr_component) | resource |
 | [azurerm_container_app_environment_storage.storage](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment_storage) | resource |
 | [azurerm_log_analytics_workspace.laws](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) | resource |
+| [azurerm_container_app_environment.container_env](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/container_app_environment) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_container_app_environment"></a> [container\_app\_environment](#input\_container\_app\_environment) | Reference to existing container apps environment to use. | <pre>object({<br>    name                = string<br>    resource_group_name = string<br>  })</pre> | `null` | no |
 | <a name="input_container_app_environment_infrastructure_subnet_id"></a> [container\_app\_environment\_infrastructure\_subnet\_id](#input\_container\_app\_environment\_infrastructure\_subnet\_id) | (Optional) The existing subnet to use for the container apps control plane. Changing this forces a new resource to be created. | `string` | `null` | no |
 | <a name="input_container_app_environment_internal_load_balancer_enabled"></a> [container\_app\_environment\_internal\_load\_balancer\_enabled](#input\_container\_app\_environment\_internal\_load\_balancer\_enabled) | (Optional) Should the Container Environment operate in Internal Load Balancing Mode? Defaults to `false`. Changing this forces a new resource to be created. | `bool` | `null` | no |
 | <a name="input_container_app_environment_name"></a> [container\_app\_environment\_name](#input\_container\_app\_environment\_name) | (Required) The name of the container apps managed environment. Changing this forces a new resource to be created. | `string` | n/a | yes |
@@ -174,4 +176,5 @@ No modules.
 | <a name="output_container_app_environment_id"></a> [container\_app\_environment\_id](#output\_container\_app\_environment\_id) | The ID of the Container App Environment within which this Container App should exist. |
 | <a name="output_container_app_fqdn"></a> [container\_app\_fqdn](#output\_container\_app\_fqdn) | The FQDN of the Container App's ingress. |
 | <a name="output_container_app_ips"></a> [container\_app\_ips](#output\_container\_app\_ips) | The IPs of the Latest Revision of the Container App. |
+| <a name="output_identity_ids"></a> [identity\_ids](#output\_identity\_ids) | The identities of the Container App. |
 <!-- END_TF_DOCS -->

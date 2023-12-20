@@ -4,19 +4,6 @@ variable "container_app_environment_name" {
   nullable    = false
 }
 
-variable "container_app_environment" {
-  type = object({
-    name                = string
-    resource_group_name = string
-  })
-  description = "Reference to existing container apps environment to use."
-  default     = null
-  validation {
-    condition     = var.container_app_environment == null ? true : var.container_app_environment.name != null && var.container_app_environment.resource_group_name != null
-    error_message = "`name` and `resource_group_name` cannot be null"
-  }
-}
-
 variable "container_apps" {
   type = map(object({
     name          = string
@@ -143,6 +130,20 @@ variable "resource_group_name" {
   type        = string
   description = "(Required) The name of the resource group in which the resources will be created."
   nullable    = false
+}
+
+variable "container_app_environment" {
+  type = object({
+    name                = string
+    resource_group_name = string
+  })
+  default     = null
+  description = "Reference to existing container apps environment to use."
+
+  validation {
+    condition     = var.container_app_environment == null ? true : var.container_app_environment.name != null && var.container_app_environment.resource_group_name != null
+    error_message = "`name` and `resource_group_name` cannot be null"
+  }
 }
 
 variable "container_app_environment_infrastructure_subnet_id" {
