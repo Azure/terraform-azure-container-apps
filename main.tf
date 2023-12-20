@@ -37,6 +37,13 @@ resource "azurerm_container_app_environment" "container_env" {
   internal_load_balancer_enabled = var.container_app_environment_internal_load_balancer_enabled
   log_analytics_workspace_id     = try(azurerm_log_analytics_workspace.laws[0].id, var.log_analytics_workspace.id)
   tags                           = var.container_app_environment_tags
+
+  lifecycle {
+    precondition {
+      condition     = var.container_app_environment_internal_load_balancer_enabled == null || var.container_app_environment_infrastructure_subnet_id != null
+      error_message = "`var.container_app_environment_internal_load_balancer_enabled` can only be set when `var.container_app_environment_infrastructure_subnet_id` is specified."
+    }
+  }
 }
 
 resource "azurerm_container_app_environment_dapr_component" "dapr" {
