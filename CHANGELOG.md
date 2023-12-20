@@ -4,6 +4,7 @@
 
 **Merged pull requests:**
 
+- Change `output identity_ids` to new `container_app_identities` [\#44](https://github.com/Azure/terraform-azure-container-apps/pull/44) ([lonegunmanb](https://github.com/lonegunmanb))
 - Fix broken example `dapr` [\#42](https://github.com/Azure/terraform-azure-container-apps/pull/42) ([lonegunmanb](https://github.com/lonegunmanb))
 - Update default value for container\_app\_environment\_internal\_load\_balancer\_enabled [\#39](https://github.com/Azure/terraform-azure-container-apps/pull/39) ([abossard](https://github.com/abossard))
 - Support existing container apps environment [\#38](https://github.com/Azure/terraform-azure-container-apps/pull/38) ([davidkarlsen](https://github.com/davidkarlsen))
