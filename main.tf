@@ -94,6 +94,7 @@ resource "azurerm_container_app" "container_app" {
   name                         = each.value.name
   resource_group_name          = var.resource_group_name
   revision_mode                = each.value.revision_mode
+  workload_profile_name        = each.value.workload_profile_name
   tags                         = each.value.tags
 
   template {

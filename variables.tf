@@ -6,9 +6,10 @@ variable "container_app_environment_name" {
 
 variable "container_apps" {
   type = map(object({
-    name          = string
-    tags          = optional(map(string))
-    revision_mode = string
+    name                  = string
+    tags                  = optional(map(string))
+    revision_mode         = string
+    workload_profile_name = optional(string, "Consumption")
 
     template = object({
       containers = set(object({
