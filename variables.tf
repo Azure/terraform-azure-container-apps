@@ -9,7 +9,7 @@ variable "container_apps" {
     name                  = string
     tags                  = optional(map(string))
     revision_mode         = string
-    workload_profile_name = optional(string, "Consumption")
+    workload_profile_name = optional(string)
 
     template = object({
       containers = set(object({
