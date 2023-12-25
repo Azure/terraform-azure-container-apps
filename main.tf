@@ -204,12 +204,12 @@ resource "azurerm_container_app" "container_app" {
       for_each = each.value.template.init_containers == null ? [] : each.value.template.init_containers
 
       content {
-        image   = init_container.value.image
-        name    = init_container.value.name
         args    = init_container.value.args
         command = init_container.value.command
         cpu     = init_container.value.cpu
+        image   = init_container.value.image
         memory  = init_container.value.memory
+        name    = init_container.value.name
 
         dynamic "env" {
           for_each = init_container.value.env == null ? [] : init_container.value.env

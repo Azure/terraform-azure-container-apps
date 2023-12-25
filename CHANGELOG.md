@@ -4,6 +4,7 @@
 
 **Merged pull requests:**
 
+- Add support for `init_container` [\#46](https://github.com/Azure/terraform-azure-container-apps/pull/46) ([lonegunmanb](https://github.com/lonegunmanb))
 - support workload profiles [\#45](https://github.com/Azure/terraform-azure-container-apps/pull/45) ([davidkarlsen](https://github.com/davidkarlsen))
 
 ## [v0.3.0](https://github.com/Azure/terraform-azure-container-apps/tree/v0.3.0) (2023-12-20)
