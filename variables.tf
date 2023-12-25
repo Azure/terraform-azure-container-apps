@@ -12,6 +12,23 @@ variable "container_apps" {
     workload_profile_name = optional(string)
 
     template = object({
+      init_containers = optional(set(object({
+        args    = optional(list(string))
+        command = optional(list(string))
+        cpu     = optional(number)
+        image   = string
+        name    = string
+        memory  = optional(string)
+        env = optional(list(object({
+          name        = string
+          secret_name = optional(string)
+          value       = optional(string)
+        })))
+        volume_mounts = optional(list(object({
+          name = string
+          path = string
+        })))
+      })), [])
       containers = set(object({
         name    = string
         image   = string
