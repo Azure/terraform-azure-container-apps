@@ -53,10 +53,10 @@ module "container_apps" {
             image  = "nginx:latest"
             memory = "1Gi"
             cpu    = 0.5
-            volume_mounts = {
+            volume_mounts = [{
               name = "shared"
               path = "/usr/share/nginx/html"
-            }
+            }]
           }
         ],
         volume = [

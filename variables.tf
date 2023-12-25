@@ -82,10 +82,10 @@ variable "container_apps" {
           timeout          = optional(number)
           transport        = string
         }))
-        volume_mounts = optional(object({
+        volume_mounts = optional(list(object({
           name = string
           path = string
-        }))
+        })))
       }))
       max_replicas    = optional(number)
       min_replicas    = optional(number)
