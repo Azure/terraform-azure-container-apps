@@ -191,7 +191,7 @@ resource "azurerm_container_app" "container_app" {
           }
         }
         dynamic "volume_mounts" {
-          for_each = container.value.volume_mounts == null ? [] : [container.value.volume_mounts]
+          for_each = container.value.volume_mounts == null ? [] : container.value.volume_mounts
 
           content {
             name = volume_mounts.value.name
