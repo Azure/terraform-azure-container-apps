@@ -135,12 +135,14 @@ docker run --rm -v ${pwd}:/src -w /src -e ARM_SUBSCRIPTION_ID -e ARM_TENANT_ID -
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.2 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 3.85, < 4.0 |
+| <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) | >= 0.2.0, < 1.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 3.85, < 4.0 |
+| <a name="provider_modtm"></a> [modtm](#provider\_modtm) | >= 0.2.0, < 1.0 |
 
 ## Modules
 
@@ -155,6 +157,7 @@ No modules.
 | [azurerm_container_app_environment_dapr_component.dapr](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment_dapr_component) | resource |
 | [azurerm_container_app_environment_storage.storage](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment_storage) | resource |
 | [azurerm_log_analytics_workspace.laws](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) | resource |
+| [modtm_telemetry.this](https://registry.terraform.io/providers/Azure/modtm/latest/docs/resources/telemetry) | resource |
 | [azurerm_container_app_environment.container_env](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/container_app_environment) | data source |
 
 ## Inputs
