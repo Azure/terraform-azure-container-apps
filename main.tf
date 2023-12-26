@@ -17,7 +17,15 @@ resource "azurerm_log_analytics_workspace" "laws" {
   reservation_capacity_in_gb_per_day = var.log_analytics_workspace_reservation_capacity_in_gb_per_day
   retention_in_days                  = var.log_analytics_workspace_retention_in_days
   sku                                = var.log_analytics_workspace_sku
-  tags                               = var.log_analytics_workspace_tags
+  tags = merge(var.log_analytics_workspace_tags, (/*<box>*/ (var.tracing_tags_enabled ? { for k, v in /*</box>*/ {
+    avm_git_commit           = "3c8fdedf05d02b33355d62341861ab3cd7f1ba6d"
+    avm_git_file             = "main.tf"
+    avm_git_last_modified_at = "2023-06-14 06:06:03"
+    avm_git_org              = "Azure"
+    avm_git_repo             = "terraform-azure-container-apps"
+    avm_yor_name             = "laws"
+    avm_yor_trace            = "74e73ebd-6cd0-4e0c-8ba3-ac40f3ab87ee"
+  } /*<box>*/ : replace(k, "avm_", var.tracing_tags_prefix) => v } : {}) /*</box>*/))
 }
 
 data "azurerm_container_app_environment" "container_env" {
@@ -36,7 +44,15 @@ resource "azurerm_container_app_environment" "container_env" {
   infrastructure_subnet_id       = var.container_app_environment_infrastructure_subnet_id
   internal_load_balancer_enabled = var.container_app_environment_internal_load_balancer_enabled
   log_analytics_workspace_id     = try(azurerm_log_analytics_workspace.laws[0].id, var.log_analytics_workspace.id)
-  tags                           = var.container_app_environment_tags
+  tags = merge(var.container_app_environment_tags, (/*<box>*/ (var.tracing_tags_enabled ? { for k, v in /*</box>*/ {
+    avm_git_commit           = "84c636e61a6658060893c04d1fcd8cec5b96bb6e"
+    avm_git_file             = "main.tf"
+    avm_git_last_modified_at = "2023-11-29 00:14:33"
+    avm_git_org              = "Azure"
+    avm_git_repo             = "terraform-azure-container-apps"
+    avm_yor_name             = "container_env"
+    avm_yor_trace            = "d94cdee8-da63-44ee-9724-ba375801e2e5"
+  } /*<box>*/ : replace(k, "avm_", var.tracing_tags_prefix) => v } : {}) /*</box>*/))
 
   lifecycle {
     precondition {
@@ -94,8 +110,16 @@ resource "azurerm_container_app" "container_app" {
   name                         = each.value.name
   resource_group_name          = var.resource_group_name
   revision_mode                = each.value.revision_mode
-  tags                         = each.value.tags
-  workload_profile_name        = each.value.workload_profile_name
+  tags = merge(each.value.tags, (/*<box>*/ (var.tracing_tags_enabled ? { for k, v in /*</box>*/ {
+    avm_git_commit           = "7003c390bef2e3f8b772b959474e6f7c26fb467e"
+    avm_git_file             = "main.tf"
+    avm_git_last_modified_at = "2023-11-28 21:02:21"
+    avm_git_org              = "Azure"
+    avm_git_repo             = "terraform-azure-container-apps"
+    avm_yor_name             = "container_app"
+    avm_yor_trace            = "43003f84-023f-44a6-96a4-d07d2a68338f"
+  } /*<box>*/ : replace(k, "avm_", var.tracing_tags_prefix) => v } : {}) /*</box>*/))
+  workload_profile_name = each.value.workload_profile_name
 
   template {
     max_replicas    = each.value.template.max_replicas

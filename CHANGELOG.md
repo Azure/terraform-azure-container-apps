@@ -4,6 +4,7 @@
 
 **Merged pull requests:**
 
+- Add missing tracing tag variables [\#49](https://github.com/Azure/terraform-azure-container-apps/pull/49) ([lonegunmanb](https://github.com/lonegunmanb))
 - Add module telemetry support [\#48](https://github.com/Azure/terraform-azure-container-apps/pull/48) ([lonegunmanb](https://github.com/lonegunmanb))
 - Correct containers' `volume_mounts`'s type. [\#47](https://github.com/Azure/terraform-azure-container-apps/pull/47) ([lonegunmanb](https://github.com/lonegunmanb))
 - Add support for `init_container` [\#46](https://github.com/Azure/terraform-azure-container-apps/pull/46) ([lonegunmanb](https://github.com/lonegunmanb))
