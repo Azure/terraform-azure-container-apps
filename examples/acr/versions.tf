@@ -10,6 +10,10 @@ terraform {
       source  = "kreuzwerker/docker"
       version = "3.0.2"
     }
+    modtm = {
+      source  = "Azure/modtm"
+      version = ">= 0.2.0, < 1.0"
+    }
     null = {
       source  = "hashicorp/null"
       version = ">= 2.0.0"
@@ -23,4 +27,8 @@ terraform {
 
 provider "azurerm" {
   features {}
+}
+
+provider "modtm" {
+  enabled = false
 }
