@@ -31,6 +31,24 @@ A Terraform module to deploy a container app in Azure with the following charact
 
 Please view folders in `examples`.
 
+## Telemetry Collection
+
+This module uses [terraform-provider-modtm](https://registry.terraform.io/providers/Azure/modtm/latest) to collect telemetry data. This provider is designed to assist with tracking the usage of Terraform modules. It creates a custom `modtm_telemetry` resource that gathers and sends telemetry data to a specified endpoint. The aim is to provide visibility into the lifecycle of your Terraform modules - whether they are being created, updated, or deleted. This data can be invaluable in understanding the usage patterns of your modules, identifying popular modules, and recognizing those that are no longer in use.
+
+The ModTM provider is designed with respect for data privacy and control. The only data collected and transmitted are the tags you define in module's `modtm_telemetry` resource, an uuid which represents a module instance's identifier, and the operation the module's caller is executing (Create/Update/Delete/Read). No other data from your Terraform modules or your environment is collected or transmitted.
+
+One of the primary design principles of the ModTM provider is its non-blocking nature. The provider is designed to work in a way that any network disconnectedness or errors during the telemetry data sending process will not cause a Terraform error or interrupt your Terraform operations. This makes the ModTM provider safe to use even in network-restricted or air-gaped environments.
+
+If the telemetry data cannot be sent due to network issues, the failure will be logged, but it will not affect the Terraform operation in progress(it might delay your operations for no more than 5 seconds). This ensures that your Terraform operations always run smoothly and without interruptions, regardless of the network conditions.
+
+You can turn off the telemetry collection by declaring the following `provider` block in your root module:
+
+```hcl
+provider "modtm" {
+  enabled = false
+}
+```
+
 ## Pre-Commit & Pr-Check & Test
 
 ### Configurations
