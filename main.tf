@@ -24,7 +24,7 @@ resource "azurerm_log_analytics_workspace" "laws" {
     avm_git_org              = "Azure"
     avm_git_repo             = "terraform-azure-container-apps"
     avm_yor_name             = "laws"
-    avm_yor_trace            = "74e73ebd-6cd0-4e0c-8ba3-ac40f3ab87ee"
+    avm_yor_trace            = "da1eccc9-6a1e-4c2f-9f17-6617cbbe586a"
   } /*<box>*/ : replace(k, "avm_", var.tracing_tags_prefix) => v } : {}) /*</box>*/))
 }
 
@@ -51,7 +51,7 @@ resource "azurerm_container_app_environment" "container_env" {
     avm_git_org              = "Azure"
     avm_git_repo             = "terraform-azure-container-apps"
     avm_yor_name             = "container_env"
-    avm_yor_trace            = "d94cdee8-da63-44ee-9724-ba375801e2e5"
+    avm_yor_trace            = "e60e03e2-2ce2-40a4-8f75-b0ebfbbbcbf5"
   } /*<box>*/ : replace(k, "avm_", var.tracing_tags_prefix) => v } : {}) /*</box>*/))
 
   lifecycle {
@@ -117,7 +117,7 @@ resource "azurerm_container_app" "container_app" {
     avm_git_org              = "Azure"
     avm_git_repo             = "terraform-azure-container-apps"
     avm_yor_name             = "container_app"
-    avm_yor_trace            = "43003f84-023f-44a6-96a4-d07d2a68338f"
+    avm_yor_trace            = "6124aae8-188a-4fbd-8e35-0b7d9eb77ad3"
   } /*<box>*/ : replace(k, "avm_", var.tracing_tags_prefix) => v } : {}) /*</box>*/))
   workload_profile_name = each.value.workload_profile_name
 
