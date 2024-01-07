@@ -1,3 +1,24 @@
+## 07 Jan 24 00:53 UTC
+
+Success: true
+
+### Versions
+
+Terraform v1.6.3
+on linux_amd64
++ provider registry.terraform.io/anschoewe/curl v1.0.2
++ provider registry.terraform.io/azure/modtm v0.2.0
++ provider registry.terraform.io/hashicorp/azurerm v3.86.0
++ provider registry.terraform.io/hashicorp/null v3.2.2
++ provider registry.terraform.io/hashicorp/random v3.6.0
++ provider registry.terraform.io/kreuzwerker/docker v3.0.2
+
+### Error
+
+
+
+---
+
 ## 31 Dec 23 00:48 UTC
 
 Success: true
