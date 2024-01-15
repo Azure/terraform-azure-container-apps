@@ -299,7 +299,7 @@ resource "azurerm_container_app" "container_app" {
         }
       }
       dynamic "ip_security_restriction" {
-        for_each = ingress.value.ip_security_restriction == null ? [] : ingress.value.ip_security_restriction
+        for_each = ingress.value.ip_security_restrictions == null ? [] : ingress.value.ip_security_restrictions
         content {
           action           = ip_security_restriction.value.action
           ip_address_range = ip_security_restriction.value.ip_address_range

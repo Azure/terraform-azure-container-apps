@@ -101,7 +101,7 @@ variable "container_apps" {
     ingress = optional(object({
       allow_insecure_connections = optional(bool, false)
       external_enabled           = optional(bool, false)
-      ip_security_restriction = optional(list(object({
+      ip_security_restrictions = optional(list(object({
         action           = string
         ip_address_range = string
         name             = string
@@ -143,7 +143,7 @@ variable "container_apps" {
     error_message = "At least one container should be provided."
   }
   validation {
-    condition = alltrue([for n, c in var.container_apps : c.ingress == null ? true : (c.ingress.ip_security_restriction == null ? true : (length(distinct([for r in c.ingress.ip_security_restriction : r.action])) == 1))])
+    condition = alltrue([for n, c in var.container_apps : c.ingress == null ? true : (c.ingress.ip_security_restrictions == null ? true : (length(distinct([for r in c.ingress.ip_security_restrictions : r.action])) <= 1))])
     error_message = "The `action` types in an all `ip_security_restriction` blocks must be the same for the `ingress`, mixing `Allow` and `Deny` rules is not currently supported by the service."
   }
 }
