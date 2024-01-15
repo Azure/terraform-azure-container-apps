@@ -142,6 +142,10 @@ variable "container_apps" {
     condition     = length(var.container_apps) >= 1
     error_message = "At least one container should be provided."
   }
+  validation {
+    condition = alltrue([for n, c in var.container_apps : c.ingress == null ? true : (c.ingress.ip_security_restriction == null ? true : (length(distinct([for r in c.ingress.ip_security_restriction : r.action])) == 1))])
+    error_message = "The `action` types in an all `ip_security_restriction` blocks must be the same for the `ingress`, mixing `Allow` and `Deny` rules is not currently supported by the service."
+  }
 }
 
 variable "location" {
