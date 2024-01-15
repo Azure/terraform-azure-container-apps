@@ -101,8 +101,14 @@ variable "container_apps" {
     ingress = optional(object({
       allow_insecure_connections = optional(bool, false)
       external_enabled           = optional(bool, false)
-      target_port                = number
-      transport                  = optional(string)
+      ip_security_restriction = optional(list(object({
+        action           = string
+        ip_address_range = string
+        name             = string
+        description      = optional(string)
+      })), [])
+      target_port = number
+      transport   = optional(string)
       traffic_weight = object({
         label           = optional(string)
         latest_revision = optional(string)
