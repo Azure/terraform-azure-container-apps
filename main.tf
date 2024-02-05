@@ -298,6 +298,15 @@ resource "azurerm_container_app" "container_app" {
           revision_suffix = traffic_weight.value.revision_suffix
         }
       }
+      dynamic "ip_security_restriction" {
+        for_each = ingress.value.ip_security_restrictions == null ? [] : ingress.value.ip_security_restrictions
+        content {
+          action           = ip_security_restriction.value.action
+          ip_address_range = ip_security_restriction.value.ip_address_range
+          name             = ip_security_restriction.value.name
+          description      = ip_security_restriction.value.description
+        }
+      }
     }
   }
   dynamic "registry" {
