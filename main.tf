@@ -363,8 +363,15 @@ resource "azurerm_container_app" "container_app" {
     content {
       name  = secret.key
       value = local.container_app_secrets[each.key][secret.key].value
-      identity = local.container_app_secrets[each.key][secret.key].identity
-      key_vault_secret_id = local.container_app_secrets[each.key][secret.key].key_vault_secret_id
+
+      dynamic "key_vault_secret" {
+        for_each = local.container_app_secrets[each.key][secret.key].identity != null && local.container_app_secrets[each.key][secret.key].key_vault_secret_id != null ? toset(local.container_app_secrets[each.key][secret.key]) : []
+
+        content {
+          identity            = key_vault_secret.value.identity
+          key_vault_secret_id = key_vault_secret.value.key_vault_secret_id
+        }
+      }
     }
   }
 }
