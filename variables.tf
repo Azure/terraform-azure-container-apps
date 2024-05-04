@@ -220,7 +220,9 @@ variable "container_app_environment_tags" {
 variable "container_app_secrets" {
   type = map(list(object({
     name  = string
-    value = string
+    value = optional(string, null)
+    identity = optional(string, null)
+    key_vault_secret_id = optional(string, null)
   })))
   default     = {}
   description = "(Optional) The secrets of the container apps. The key of the map should be aligned with the corresponding container app."
