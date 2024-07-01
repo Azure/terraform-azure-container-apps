@@ -324,7 +324,9 @@ resource "azurerm_container_app" "container_app" {
 
     content {
       name  = secret.key
-      value = local.container_app_secrets[each.key][secret.key]
+      value = local.container_app_secrets[each.key][secret.key].value
+      identity = local.container_app_secrets[each.key][secret.key].identity
+      key_vault_secret_id = local.container_app_secrets[each.key][secret.key].key_vault_secret_id
     }
   }
 }
