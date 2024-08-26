@@ -261,6 +261,36 @@ resource "azurerm_container_app" "container_app" {
         storage_type = volume.value.storage_type
       }
     }
+    dynamic "http_scale_rule" {
+      for_each = each.value.template.http_scale_rules
+      content {
+        name                = http_scale_rule.value.name
+        concurrent_requests = http_scale_rule.value.concurrent_requests
+        dynamic "authentication" {
+          for_each = http_scale_rule.value.authentication != null ? [http_scale_rule.value.authentication] : []
+          content {
+            secret_name       = authentication.value.secret_name
+            trigger_parameter = authentication.value.trigger_parameter
+          }
+        }
+      }
+    }
+
+    dynamic "custom_scale_rule" {
+      for_each = each.value.template.custom_scale_rules
+      content {
+        name             = custom_scale_rule.value.name
+        custom_rule_type = custom_scale_rule.value.custom_rule_type
+        metadata         = custom_scale_rule.value.metadata
+        dynamic "authentication" {
+          for_each = custom_scale_rule.value.authentication != null ? [custom_scale_rule.value.authentication] : []
+          content {
+            secret_name       = authentication.value.secret_name
+            trigger_parameter = authentication.value.trigger_parameter
+          }
+        }
+      }
+    }
   }
   dynamic "dapr" {
     for_each = each.value.dapr == null ? [] : [each.value.dapr]
@@ -327,4 +357,5 @@ resource "azurerm_container_app" "container_app" {
       value = local.container_app_secrets[each.key][secret.key]
     }
   }
+
 }
