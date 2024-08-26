@@ -90,7 +90,23 @@ variable "container_apps" {
       max_replicas    = optional(number)
       min_replicas    = optional(number)
       revision_suffix = optional(string)
-
+      http_scale_rules = optional(list(object({
+        name                = string
+        concurrent_requests = number
+        authentication = optional(object({
+          secret_name       = string
+          trigger_parameter = string
+        }))
+      })))
+      custom_scale_rules = optional(list(object({
+        name             = string
+        custom_rule_type = string # See https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app#custom_rule_type
+        metadata         = map(string)
+        authentication = optional(object({
+          secret_name       = string
+          trigger_parameter = string
+        }))
+      })))
       volume = optional(set(object({
         name         = string
         storage_name = optional(string)
@@ -134,6 +150,7 @@ variable "container_apps" {
       password_secret_name = optional(string)
       identity             = optional(string)
     })))
+
   }))
   description = "The container apps to deploy."
   nullable    = false
@@ -145,6 +162,14 @@ variable "container_apps" {
   validation {
     condition     = alltrue([for n, c in var.container_apps : c.ingress == null ? true : (c.ingress.ip_security_restrictions == null ? true : (length(distinct([for r in c.ingress.ip_security_restrictions : r.action])) <= 1))])
     error_message = "The `action` types in an all `ip_security_restriction` blocks must be the same for the `ingress`, mixing `Allow` and `Deny` rules is not currently supported by the service."
+  }
+  validation {
+    condition     = alltrue([for n, c in var.container_apps : c.template.custom_scale_rules == null || alltrue([for _, r in c.template.custom_scale_rules : can(regex("^[a-z0-9][a-z0-9-.]*[a-z0-9]$", r.name))])])
+    error_message = "The `name` in `custom_scale_rule` must consist of lower case alphanumeric characters, '-', or '.', and should start and end with an alphanumeric character."
+  }
+  validation {
+    condition     = alltrue([for n, c in var.container_apps : c.template.http_scale_rules == null || alltrue([for _, r in c.template.http_scale_rules : can(regex("^[a-z0-9][a-z0-9-.]*[a-z0-9]$", r.name))])])
+    error_message = "The `name` in `http_scale_rule` must consist of lower case alphanumeric characters, '-', or '.', and should start and end with an alphanumeric character."
   }
 }
 
