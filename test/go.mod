@@ -1,6 +1,8 @@
 module terraform-azurerm-container-apps
 
-go 1.18
+go 1.22.0
+
+toolchain go1.22.5
 
 require (
 	github.com/Azure/terraform-module-test-helper v0.26.0

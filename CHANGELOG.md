@@ -4,6 +4,7 @@
 
 **Merged pull requests:**
 
+- Bump github.com/Azure/terraform-module-test-helper in /test [\#62](https://github.com/Azure/terraform-azure-container-apps/pull/62) ([lonegunmanb](https://github.com/lonegunmanb))
 - Use oidc as e2e test authentication method [\#60](https://github.com/Azure/terraform-azure-container-apps/pull/60) ([lonegunmanb](https://github.com/lonegunmanb))
 - Add support for `container_app.ingress.ingress.ip_security_restriction` [\#50](https://github.com/Azure/terraform-azure-container-apps/pull/50) ([lonegunmanb](https://github.com/lonegunmanb))
 
