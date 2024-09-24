@@ -228,15 +228,16 @@ resource "azurerm_container_app" "container_app" {
       for_each = each.value.template.init_containers == null ? [] : each.value.template.init_containers
 
       content {
+        image   = init_container.value.image
+        name    = init_container.value.name
         args    = init_container.value.args
         command = init_container.value.command
         cpu     = init_container.value.cpu
-        image   = init_container.value.image
         memory  = init_container.value.memory
-        name    = init_container.value.name
 
         dynamic "env" {
           for_each = init_container.value.env == null ? [] : init_container.value.env
+
           content {
             name        = env.value.name
             secret_name = env.value.secret_name
@@ -245,6 +246,7 @@ resource "azurerm_container_app" "container_app" {
         }
         dynamic "volume_mounts" {
           for_each = init_container.value.volume_mounts == null ? [] : init_container.value.volume_mounts
+
           content {
             name = volume_mounts.value.name
             path = volume_mounts.value.path
@@ -300,6 +302,7 @@ resource "azurerm_container_app" "container_app" {
       }
       dynamic "ip_security_restriction" {
         for_each = ingress.value.ip_security_restrictions == null ? [] : ingress.value.ip_security_restrictions
+
         content {
           action           = ip_security_restriction.value.action
           ip_address_range = ip_security_restriction.value.ip_address_range

@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased](https://github.com/Azure/terraform-azure-container-apps/tree/HEAD)
+
+**Merged pull requests:**
+
+- Use oidc as e2e test authentication method [\#60](https://github.com/Azure/terraform-azure-container-apps/pull/60) ([lonegunmanb](https://github.com/lonegunmanb))
+- Add support for `container_app.ingress.ingress.ip_security_restriction` [\#50](https://github.com/Azure/terraform-azure-container-apps/pull/50) ([lonegunmanb](https://github.com/lonegunmanb))
+
 ## [v0.4.0](https://github.com/Azure/terraform-azure-container-apps/tree/v0.4.0) (2023-12-26)
 
 **Merged pull requests:**
