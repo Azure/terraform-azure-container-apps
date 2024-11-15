@@ -4,6 +4,7 @@
 
 **Merged pull requests:**
 
+- Add support for autoscale rules [\#66](https://github.com/Azure/terraform-azure-container-apps/pull/66) ([lonegunmanb](https://github.com/lonegunmanb))
 - Bump github.com/Azure/terraform-module-test-helper in /test [\#65](https://github.com/Azure/terraform-azure-container-apps/pull/65) ([lonegunmanb](https://github.com/lonegunmanb))
 - Bump github.com/Azure/terraform-module-test-helper in /test [\#62](https://github.com/Azure/terraform-azure-container-apps/pull/62) ([lonegunmanb](https://github.com/lonegunmanb))
 - Use oidc as e2e test authentication method [\#60](https://github.com/Azure/terraform-azure-container-apps/pull/60) ([lonegunmanb](https://github.com/lonegunmanb))
