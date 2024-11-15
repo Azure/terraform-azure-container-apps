@@ -219,9 +219,9 @@ variable "container_app_environment_tags" {
 
 variable "container_app_secrets" {
   type = map(list(object({
-    name  = string
-    value = optional(string, null)
-    identity = optional(string, null)
+    name                = string
+    value               = optional(string, null)
+    identity            = optional(string, null)
     key_vault_secret_id = optional(string, null)
   })))
   default     = {}
