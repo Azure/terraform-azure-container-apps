@@ -371,3 +371,43 @@ resource "azurerm_container_app" "container_app" {
     }
   }
 }
+
+resource "terraform_data" "container_app_ingress_additional_port_mappings_keeper" {
+  for_each = var.container_apps
+  triggers_replace = {
+    ingress = try([for p in each.value.ingress.additional_port_mappings : ({
+      additionalPortMappings = [{
+        external    = p.external
+        targetPort  = p.target_port
+        exposedPort = p.exposed_port
+      }]
+    })], null)
+  }
+}
+
+resource "azapi_update_resource" "container_app_ingress_additional_port_mappings" {
+  for_each = true ? var.container_apps : {}
+
+  type = "Microsoft.App/containerApps@2024-03-01"
+  body = {
+    properties = {
+      configuration = {
+        ingress = try({
+          additionalPortMappings = [for p in each.value.ingress.additional_port_mappings : {
+            external    = p.external
+            targetPort  = p.target_port
+            exposedPort = p.exposed_port
+          }]
+        }, null)
+      }
+    }
+  }
+  resource_id = azurerm_container_app.container_app[each.key].id
+
+  lifecycle {
+    ignore_changes = all
+    replace_triggered_by = [
+      terraform_data.container_app_ingress_additional_port_mappings_keeper[each.key]
+    ]
+  }
+}

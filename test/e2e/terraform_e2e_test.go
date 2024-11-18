@@ -66,6 +66,16 @@ func TestInitContainer(t *testing.T) {
 	})
 }
 
+func TestExamplesAdditionalPort(t *testing.T) {
+	t.Parallel()
+	vars := make(map[string]interface{})
+
+	test_helper.RunE2ETest(t, "../../", "examples/additional_port", terraform.Options{
+		Upgrade: true,
+		Vars:    vars,
+	}, func(t *testing.T, output test_helper.TerraformOutput) {})
+}
+
 func getHTML(url string) (string, error) {
 	resp, err := http.Get(url) // #nosec G107
 	if err != nil {

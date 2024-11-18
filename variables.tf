@@ -132,6 +132,11 @@ variable "container_apps" {
         revision_suffix = optional(string)
         percentage      = number
       })
+      additional_port_mappings = optional(list(object({
+        external     = bool
+        target_port  = number
+        exposed_port = optional(number)
+      })), [])
     }))
 
     identity = optional(object({
@@ -175,6 +180,10 @@ variable "container_apps" {
   validation {
     condition     = alltrue([for n, c in var.container_apps : c.ingress == null ? true : c.ingress.transport == "tcp" || c.ingress.exposed_port == null])
     error_message = "`exposed_port` can only be specified when `transport` is set to `tcp`."
+  }
+  validation {
+    condition     = alltrue([for n, c in var.container_apps : c.ingress == null ? true : length(distinct(concat(try([c.ingress.target_port], []), try([for p in c.ingress.additional_port_mappings : p.target_port], [])))) == length(concat(try([c.ingress.target_port], []), try([for p in c.ingress.additional_port_mappings : p.target_port], [])))])
+    error_message = "`target_port` in `ingress` must be unique."
   }
 }
 
