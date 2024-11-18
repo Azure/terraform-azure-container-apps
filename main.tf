@@ -375,13 +375,13 @@ resource "azurerm_container_app" "container_app" {
 resource "terraform_data" "container_app_ingress_additional_port_mappings_keeper" {
   for_each = var.container_apps
   triggers_replace = {
-    ingress = try([for p in each.value.ingress.additional_port_mappings : ({
-      additionalPortMappings = [{
+    ingress = try({
+      additionalPortMappings = [for p in each.value.ingress.additional_port_mappings : {
         external    = p.external
         targetPort  = p.target_port
         exposedPort = p.exposed_port
       }]
-    })], null)
+    }, null)
   }
 }
 
