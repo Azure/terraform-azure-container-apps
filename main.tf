@@ -324,6 +324,7 @@ resource "azurerm_container_app" "container_app" {
     content {
       target_port                = ingress.value.target_port
       allow_insecure_connections = ingress.value.allow_insecure_connections
+      exposed_port               = ingress.value.exposed_port
       external_enabled           = ingress.value.external_enabled
       transport                  = ingress.value.transport
 
@@ -368,5 +369,45 @@ resource "azurerm_container_app" "container_app" {
       key_vault_secret_id = local.container_app_secrets[each.key][secret.key].key_vault_secret_id
       value               = local.container_app_secrets[each.key][secret.key].value
     }
+  }
+}
+
+resource "terraform_data" "container_app_ingress_additional_port_mappings_keeper" {
+  for_each = var.container_apps
+  triggers_replace = {
+    ingress = try({
+      additionalPortMappings = [for p in each.value.ingress.additional_port_mappings : {
+        external    = p.external
+        targetPort  = p.target_port
+        exposedPort = p.exposed_port
+      }]
+    }, null)
+  }
+}
+
+resource "azapi_update_resource" "container_app_ingress_additional_port_mappings" {
+  for_each = true ? var.container_apps : {}
+
+  type = "Microsoft.App/containerApps@2024-03-01"
+  body = {
+    properties = {
+      configuration = {
+        ingress = try({
+          additionalPortMappings = [for p in each.value.ingress.additional_port_mappings : {
+            external    = p.external
+            targetPort  = p.target_port
+            exposedPort = p.exposed_port
+          }]
+        }, null)
+      }
+    }
+  }
+  resource_id = azurerm_container_app.container_app[each.key].id
+
+  lifecycle {
+    ignore_changes = all
+    replace_triggered_by = [
+      terraform_data.container_app_ingress_additional_port_mappings_keeper[each.key]
+    ]
   }
 }

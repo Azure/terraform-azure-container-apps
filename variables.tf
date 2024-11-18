@@ -123,14 +123,20 @@ variable "container_apps" {
         name             = string
         description      = optional(string)
       })), [])
-      target_port = number
-      transport   = optional(string)
+      target_port  = number
+      exposed_port = optional(number)
+      transport    = optional(string)
       traffic_weight = object({
         label           = optional(string)
         latest_revision = optional(string)
         revision_suffix = optional(string)
         percentage      = number
       })
+      additional_port_mappings = optional(list(object({
+        external     = bool
+        target_port  = number
+        exposed_port = optional(number)
+      })), [])
     }))
 
     identity = optional(object({
@@ -170,6 +176,14 @@ variable "container_apps" {
   validation {
     condition     = alltrue([for n, c in var.container_apps : c.template.http_scale_rule == null ? true : alltrue([for _, r in c.template.http_scale_rule : can(regex("^[a-z0-9][a-z0-9-.]*[a-z0-9]$", r.name))])])
     error_message = "The `name` in `http_scale_rule` must consist of lower case alphanumeric characters, '-', or '.', and should start and end with an alphanumeric character."
+  }
+  validation {
+    condition     = alltrue([for n, c in var.container_apps : c.ingress == null ? true : c.ingress.transport == "tcp" || c.ingress.exposed_port == null])
+    error_message = "`exposed_port` can only be specified when `transport` is set to `tcp`."
+  }
+  validation {
+    condition     = alltrue([for n, c in var.container_apps : c.ingress == null ? true : length(distinct(concat(try([c.ingress.target_port], []), try([for p in c.ingress.additional_port_mappings : p.target_port], [])))) == length(concat(try([c.ingress.target_port], []), try([for p in c.ingress.additional_port_mappings : p.target_port], [])))])
+    error_message = "`target_port` in `ingress` must be unique."
   }
 }
 
