@@ -8,11 +8,6 @@ output "container_app_fqdn" {
   value       = local.fqdns
 }
 
-output "container_app_uri" {
-  description = "The URI of the Container App's ingress."
-  value       = local.uris
-}
-
 output "container_app_identities" {
   description = "The identities of the Container App, key is Container App's name."
   value = { for name, container in azurerm_container_app.container_app : name => length(container.identity) > 0 ? {
@@ -26,6 +21,11 @@ output "container_app_identities" {
 output "container_app_ips" {
   description = "The IPs of the Latest Revision of the Container App."
   value       = local.container_app_environment_static_ip_address
+}
+
+output "container_app_uri" {
+  description = "The URI of the Container App's ingress."
+  value       = local.uris
 }
 
 output "default_domain" {
