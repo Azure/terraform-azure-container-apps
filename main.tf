@@ -361,9 +361,9 @@ resource "azurerm_container_app" "container_app" {
     for_each = nonsensitive(toset([for pair in lookup(var.container_app_secrets, each.key, []) : pair.name]))
 
     content {
-      name  = secret.key
-      value = local.container_app_secrets[each.key][secret.key].value
-      identity = local.container_app_secrets[each.key][secret.key].identity
+      name                = secret.key
+      value               = local.container_app_secrets[each.key][secret.key].value
+      identity            = local.container_app_secrets[each.key][secret.key].identity
       key_vault_secret_id = local.container_app_secrets[each.key][secret.key].key_vault_secret_id
     }
   }
