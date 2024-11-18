@@ -197,4 +197,6 @@ No modules.
 | <a name="output_container_app_fqdn"></a> [container\_app\_fqdn](#output\_container\_app\_fqdn) | The FQDN of the Container App's ingress. |
 | <a name="output_container_app_identities"></a> [container\_app\_identities](#output\_container\_app\_identities) | The identities of the Container App, key is Container App's name. |
 | <a name="output_container_app_ips"></a> [container\_app\_ips](#output\_container\_app\_ips) | The IPs of the Latest Revision of the Container App. |
+| <a name="output_container_app_uri"></a> [container\_app\_uri](#output\_container\_app\_uri) | The URI of the Container App's ingress. |
+| <a name="output_default_domain"></a> [default\_domain](#output\_default\_domain) | The default domain of the Container App Environment. |
 <!-- END_TF_DOCS -->

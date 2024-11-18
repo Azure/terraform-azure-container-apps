@@ -5,12 +5,12 @@ output "container_app_environment_id" {
 
 output "container_app_fqdn" {
   description = "The FQDN of the Container App's ingress."
-  value       = { for name, container in azurerm_container_app.container_app : name => "${try(container.ingress[0].fqdn, "")}" if can(container.ingress[0].fqdn) }
+  value       = local.fqdns
 }
 
 output "container_app_uri" {
   description = "The URI of the Container App's ingress."
-  value       = { for name, container in azurerm_container_app.container_app : name => "https://${try(container.ingress[0].fqdn, "")}" if can(container.ingress[0].fqdn) }
+  value       = local.uris
 }
 
 output "container_app_identities" {
