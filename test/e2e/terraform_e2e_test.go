@@ -13,6 +13,7 @@ import (
 )
 
 func TestExamplesDapr(t *testing.T) {
+	t.Parallel()
 	// For dapr example
 	var vars map[string]any
 	managedIdentityId := os.Getenv("MSI_ID")
@@ -29,6 +30,7 @@ func TestExamplesDapr(t *testing.T) {
 }
 
 func TestExamplesStartup(t *testing.T) {
+	t.Parallel()
 	vars := make(map[string]interface{})
 
 	test_helper.RunE2ETest(t, "../../", "examples/startup", terraform.Options{
@@ -38,6 +40,7 @@ func TestExamplesStartup(t *testing.T) {
 }
 
 func TestExampleAcr(t *testing.T) {
+	t.Parallel()
 	test_helper.RunE2ETest(t, "../..", "examples/acr", terraform.Options{
 		Upgrade: true,
 	}, func(t *testing.T, output test_helper.TerraformOutput) {
@@ -47,6 +50,19 @@ func TestExampleAcr(t *testing.T) {
 		html, err := getHTML(url)
 		require.NoError(t, err)
 		assert.Contains(t, html, "nginx")
+	})
+}
+
+func TestInitContainer(t *testing.T) {
+	t.Parallel()
+	test_helper.RunE2ETest(t, "../..", "examples/init-container", terraform.Options{
+		Upgrade: true,
+	}, func(t *testing.T, output test_helper.TerraformOutput) {
+		url, ok := output["url"].(string)
+		require.True(t, ok)
+		html, err := getHTML(url)
+		require.NoError(t, err)
+		assert.Contains(t, html, "Hello from the debian container")
 	})
 }
 

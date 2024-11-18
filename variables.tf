@@ -6,11 +6,29 @@ variable "container_app_environment_name" {
 
 variable "container_apps" {
   type = map(object({
-    name          = string
-    tags          = optional(map(string))
-    revision_mode = string
+    name                  = string
+    tags                  = optional(map(string))
+    revision_mode         = string
+    workload_profile_name = optional(string)
 
     template = object({
+      init_containers = optional(set(object({
+        args    = optional(list(string))
+        command = optional(list(string))
+        cpu     = optional(number)
+        image   = string
+        name    = string
+        memory  = optional(string)
+        env = optional(list(object({
+          name        = string
+          secret_name = optional(string)
+          value       = optional(string)
+        })))
+        volume_mounts = optional(list(object({
+          name = string
+          path = string
+        })))
+      })), [])
       containers = set(object({
         name    = string
         image   = string
@@ -64,15 +82,31 @@ variable "container_apps" {
           timeout          = optional(number)
           transport        = string
         }))
-        volume_mounts = optional(object({
+        volume_mounts = optional(list(object({
           name = string
           path = string
-        }))
+        })))
       }))
       max_replicas    = optional(number)
       min_replicas    = optional(number)
       revision_suffix = optional(string)
-
+      custom_scale_rule = optional(list(object({
+        custom_rule_type = string
+        metadata         = map(string)
+        name             = string
+        authentication = optional(list(object({
+          secret_name       = string
+          trigger_parameter = string
+        })))
+      })))
+      http_scale_rule = optional(list(object({
+        concurrent_requests = string
+        name                = string
+        authentication = optional(list(object({
+          secret_name       = string
+          trigger_parameter = optional(string)
+        })))
+      })))
       volume = optional(set(object({
         name         = string
         storage_name = optional(string)
@@ -83,8 +117,14 @@ variable "container_apps" {
     ingress = optional(object({
       allow_insecure_connections = optional(bool, false)
       external_enabled           = optional(bool, false)
-      target_port                = number
-      transport                  = optional(string)
+      ip_security_restrictions = optional(list(object({
+        action           = string
+        ip_address_range = string
+        name             = string
+        description      = optional(string)
+      })), [])
+      target_port = number
+      transport   = optional(string)
       traffic_weight = object({
         label           = optional(string)
         latest_revision = optional(string)
@@ -110,6 +150,7 @@ variable "container_apps" {
       password_secret_name = optional(string)
       identity             = optional(string)
     })))
+
   }))
   description = "The container apps to deploy."
   nullable    = false
@@ -117,6 +158,18 @@ variable "container_apps" {
   validation {
     condition     = length(var.container_apps) >= 1
     error_message = "At least one container should be provided."
+  }
+  validation {
+    condition     = alltrue([for n, c in var.container_apps : c.ingress == null ? true : (c.ingress.ip_security_restrictions == null ? true : (length(distinct([for r in c.ingress.ip_security_restrictions : r.action])) <= 1))])
+    error_message = "The `action` types in an all `ip_security_restriction` blocks must be the same for the `ingress`, mixing `Allow` and `Deny` rules is not currently supported by the service."
+  }
+  validation {
+    condition     = alltrue([for n, c in var.container_apps : c.template.custom_scale_rule == null ? true : alltrue([for _, r in c.template.custom_scale_rule : can(regex("^[a-z0-9][a-z0-9-.]*[a-z0-9]$", r.name))])])
+    error_message = "The `name` in `custom_scale_rule` must consist of lower case alphanumeric characters, '-', or '.', and should start and end with an alphanumeric character."
+  }
+  validation {
+    condition     = alltrue([for n, c in var.container_apps : c.template.http_scale_rule == null ? true : alltrue([for _, r in c.template.http_scale_rule : can(regex("^[a-z0-9][a-z0-9-.]*[a-z0-9]$", r.name))])])
+    error_message = "The `name` in `http_scale_rule` must consist of lower case alphanumeric characters, '-', or '.', and should start and end with an alphanumeric character."
   }
 }
 
@@ -126,16 +179,24 @@ variable "location" {
   nullable    = false
 }
 
-variable "log_analytics_workspace_name" {
-  type        = string
-  description = "(Required) Specifies the name of the Log Analytics Workspace. Changing this forces a new resource to be created."
-  nullable    = false
-}
-
 variable "resource_group_name" {
   type        = string
   description = "(Required) The name of the resource group in which the resources will be created."
   nullable    = false
+}
+
+variable "container_app_environment" {
+  type = object({
+    name                = string
+    resource_group_name = string
+  })
+  default     = null
+  description = "Reference to existing container apps environment to use."
+
+  validation {
+    condition     = var.container_app_environment == null ? true : var.container_app_environment.name != null && var.container_app_environment.resource_group_name != null
+    error_message = "`name` and `resource_group_name` cannot be null"
+  }
 }
 
 variable "container_app_environment_infrastructure_subnet_id" {
@@ -146,7 +207,7 @@ variable "container_app_environment_infrastructure_subnet_id" {
 
 variable "container_app_environment_internal_load_balancer_enabled" {
   type        = bool
-  default     = false
+  default     = null
   description = "(Optional) Should the Container Environment operate in Internal Load Balancing Mode? Defaults to `false`. Changing this forces a new resource to be created."
 }
 
@@ -158,8 +219,10 @@ variable "container_app_environment_tags" {
 
 variable "container_app_secrets" {
   type = map(list(object({
-    name  = string
-    value = string
+    name                = string
+    value               = optional(string, null)
+    identity            = optional(string, null)
+    key_vault_secret_id = optional(string, null)
   })))
   default     = {}
   description = "(Optional) The secrets of the container apps. The key of the map should be aligned with the corresponding container app."
@@ -260,6 +323,12 @@ variable "log_analytics_workspace_local_authentication_disabled" {
   description = "(Optional) Specifies if the log analytics workspace should enforce authentication using Azure Active Directory. Defaults to `false`."
 }
 
+variable "log_analytics_workspace_name" {
+  type        = string
+  default     = null
+  description = "(Optional) Specifies the name of the Log Analytics Workspace. Must set this variable if `var.log_analytics_workspace` is `null`. Changing this forces a new resource to be created."
+}
+
 variable "log_analytics_workspace_reservation_capacity_in_gb_per_day" {
   type        = number
   default     = null
@@ -282,4 +351,20 @@ variable "log_analytics_workspace_tags" {
   type        = map(string)
   default     = null
   description = "(Optional) A mapping of tags to assign to the resource."
+}
+
+# tflint-ignore: terraform_unused_declarations
+variable "tracing_tags_enabled" {
+  type        = bool
+  default     = false
+  description = "Whether enable tracing tags that generated by BridgeCrew Yor."
+  nullable    = false
+}
+
+# tflint-ignore: terraform_unused_declarations
+variable "tracing_tags_prefix" {
+  type        = string
+  default     = "avm_"
+  description = "Default prefix for generated tracing tags"
+  nullable    = false
 }

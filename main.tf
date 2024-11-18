@@ -1,3 +1,7 @@
+locals {
+  container_app_environment_id = try(data.azurerm_container_app_environment.container_env[0].id, azurerm_container_app_environment.container_env[0].id)
+}
+
 resource "azurerm_log_analytics_workspace" "laws" {
   count = var.log_analytics_workspace == null ? 1 : 0
 
@@ -13,24 +17,56 @@ resource "azurerm_log_analytics_workspace" "laws" {
   reservation_capacity_in_gb_per_day = var.log_analytics_workspace_reservation_capacity_in_gb_per_day
   retention_in_days                  = var.log_analytics_workspace_retention_in_days
   sku                                = var.log_analytics_workspace_sku
-  tags                               = var.log_analytics_workspace_tags
+  tags = merge(var.log_analytics_workspace_tags, (/*<box>*/ (var.tracing_tags_enabled ? { for k, v in /*</box>*/ {
+    avm_git_commit           = "3c8fdedf05d02b33355d62341861ab3cd7f1ba6d"
+    avm_git_file             = "main.tf"
+    avm_git_last_modified_at = "2023-06-14 06:06:03"
+    avm_git_org              = "Azure"
+    avm_git_repo             = "terraform-azure-container-apps"
+    avm_yor_name             = "laws"
+    avm_yor_trace            = "da1eccc9-6a1e-4c2f-9f17-6617cbbe586a"
+  } /*<box>*/ : replace(k, "avm_", var.tracing_tags_prefix) => v } : {}) /*</box>*/))
+}
+
+data "azurerm_container_app_environment" "container_env" {
+  count = var.container_app_environment != null ? 1 : 0
+
+  name                = var.container_app_environment.name
+  resource_group_name = var.container_app_environment.resource_group_name
 }
 
 resource "azurerm_container_app_environment" "container_env" {
+  count = var.container_app_environment == null ? 1 : 0
+
   location                       = var.location
-  log_analytics_workspace_id     = try(azurerm_log_analytics_workspace.laws[0].id, var.log_analytics_workspace.id)
   name                           = var.container_app_environment_name
   resource_group_name            = var.resource_group_name
   infrastructure_subnet_id       = var.container_app_environment_infrastructure_subnet_id
   internal_load_balancer_enabled = var.container_app_environment_internal_load_balancer_enabled
-  tags                           = var.container_app_environment_tags
+  log_analytics_workspace_id     = try(azurerm_log_analytics_workspace.laws[0].id, var.log_analytics_workspace.id)
+  tags = merge(var.container_app_environment_tags, (/*<box>*/ (var.tracing_tags_enabled ? { for k, v in /*</box>*/ {
+    avm_git_commit           = "84c636e61a6658060893c04d1fcd8cec5b96bb6e"
+    avm_git_file             = "main.tf"
+    avm_git_last_modified_at = "2023-11-29 00:14:33"
+    avm_git_org              = "Azure"
+    avm_git_repo             = "terraform-azure-container-apps"
+    avm_yor_name             = "container_env"
+    avm_yor_trace            = "e60e03e2-2ce2-40a4-8f75-b0ebfbbbcbf5"
+  } /*<box>*/ : replace(k, "avm_", var.tracing_tags_prefix) => v } : {}) /*</box>*/))
+
+  lifecycle {
+    precondition {
+      condition     = var.container_app_environment_internal_load_balancer_enabled == null || var.container_app_environment_infrastructure_subnet_id != null
+      error_message = "`var.container_app_environment_internal_load_balancer_enabled` can only be set when `var.container_app_environment_infrastructure_subnet_id` is specified."
+    }
+  }
 }
 
 resource "azurerm_container_app_environment_dapr_component" "dapr" {
   for_each = var.dapr_component
 
   component_type               = each.value.component_type
-  container_app_environment_id = azurerm_container_app_environment.container_env.id
+  container_app_environment_id = local.container_app_environment_id
   name                         = each.value.name
   version                      = each.value.version
   ignore_errors                = each.value.ignore_errors
@@ -62,7 +98,7 @@ resource "azurerm_container_app_environment_storage" "storage" {
   access_key                   = var.environment_storage_access_key[each.key]
   access_mode                  = each.value.access_mode
   account_name                 = each.value.account_name
-  container_app_environment_id = azurerm_container_app_environment.container_env.id
+  container_app_environment_id = local.container_app_environment_id
   name                         = each.value.name
   share_name                   = each.value.share_name
 }
@@ -70,11 +106,20 @@ resource "azurerm_container_app_environment_storage" "storage" {
 resource "azurerm_container_app" "container_app" {
   for_each = var.container_apps
 
-  container_app_environment_id = azurerm_container_app_environment.container_env.id
+  container_app_environment_id = local.container_app_environment_id
   name                         = each.value.name
   resource_group_name          = var.resource_group_name
   revision_mode                = each.value.revision_mode
-  tags                         = each.value.tags
+  tags = merge(each.value.tags, (/*<box>*/ (var.tracing_tags_enabled ? { for k, v in /*</box>*/ {
+    avm_git_commit           = "7003c390bef2e3f8b772b959474e6f7c26fb467e"
+    avm_git_file             = "main.tf"
+    avm_git_last_modified_at = "2023-11-28 21:02:21"
+    avm_git_org              = "Azure"
+    avm_git_repo             = "terraform-azure-container-apps"
+    avm_yor_name             = "container_app"
+    avm_yor_trace            = "6124aae8-188a-4fbd-8e35-0b7d9eb77ad3"
+  } /*<box>*/ : replace(k, "avm_", var.tracing_tags_prefix) => v } : {}) /*</box>*/))
+  workload_profile_name = each.value.workload_profile_name
 
   template {
     max_replicas    = each.value.template.max_replicas
@@ -170,7 +215,72 @@ resource "azurerm_container_app" "container_app" {
           }
         }
         dynamic "volume_mounts" {
-          for_each = container.value.volume_mounts == null ? [] : [container.value.volume_mounts]
+          for_each = container.value.volume_mounts == null ? [] : container.value.volume_mounts
+
+          content {
+            name = volume_mounts.value.name
+            path = volume_mounts.value.path
+          }
+        }
+      }
+    }
+    dynamic "custom_scale_rule" {
+      for_each = each.value.template.custom_scale_rule == null ? [] : each.value.template.custom_scale_rule
+
+      content {
+        custom_rule_type = custom_scale_rule.value.custom_rule_type
+        metadata         = custom_scale_rule.value.metadata
+        name             = custom_scale_rule.value.name
+
+        dynamic "authentication" {
+          for_each = custom_scale_rule.value.authentication == null ? [] : custom_scale_rule.value.authentication
+
+          content {
+            secret_name       = authentication.value.secret_name
+            trigger_parameter = authentication.value.trigger_parameter
+          }
+        }
+      }
+    }
+    dynamic "http_scale_rule" {
+      for_each = each.value.template.http_scale_rule == null ? [] : each.value.template.http_scale_rule
+
+      content {
+        concurrent_requests = http_scale_rule.value.concurrent_requests
+        name                = http_scale_rule.value.name
+
+        dynamic "authentication" {
+          for_each = http_scale_rule.value.authentication == null ? [] : http_scale_rule.value.authentication
+
+          content {
+            secret_name       = authentication.value.secret_name
+            trigger_parameter = authentication.value.trigger_parameter
+          }
+        }
+      }
+    }
+    dynamic "init_container" {
+      for_each = each.value.template.init_containers == null ? [] : each.value.template.init_containers
+
+      content {
+        image   = init_container.value.image
+        name    = init_container.value.name
+        args    = init_container.value.args
+        command = init_container.value.command
+        cpu     = init_container.value.cpu
+        memory  = init_container.value.memory
+
+        dynamic "env" {
+          for_each = init_container.value.env == null ? [] : init_container.value.env
+
+          content {
+            name        = env.value.name
+            secret_name = env.value.secret_name
+            value       = env.value.value
+          }
+        }
+        dynamic "volume_mounts" {
+          for_each = init_container.value.volume_mounts == null ? [] : init_container.value.volume_mounts
 
           content {
             name = volume_mounts.value.name
@@ -225,6 +335,16 @@ resource "azurerm_container_app" "container_app" {
           revision_suffix = traffic_weight.value.revision_suffix
         }
       }
+      dynamic "ip_security_restriction" {
+        for_each = ingress.value.ip_security_restrictions == null ? [] : ingress.value.ip_security_restrictions
+
+        content {
+          action           = ip_security_restriction.value.action
+          ip_address_range = ip_security_restriction.value.ip_address_range
+          name             = ip_security_restriction.value.name
+          description      = ip_security_restriction.value.description
+        }
+      }
     }
   }
   dynamic "registry" {
@@ -241,8 +361,10 @@ resource "azurerm_container_app" "container_app" {
     for_each = nonsensitive(toset([for pair in lookup(var.container_app_secrets, each.key, []) : pair.name]))
 
     content {
-      name  = secret.key
-      value = local.container_app_secrets[each.key][secret.key]
+      name                = secret.key
+      identity            = local.container_app_secrets[each.key][secret.key].identity
+      key_vault_secret_id = local.container_app_secrets[each.key][secret.key].key_vault_secret_id
+      value               = local.container_app_secrets[each.key][secret.key].value
     }
   }
 }

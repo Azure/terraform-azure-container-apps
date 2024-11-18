@@ -205,8 +205,8 @@ resource "azurerm_log_analytics_storage_insights" "test" {
 
 resource "azurerm_storage_account_customer_managed_key" "managedkey" {
   key_name           = azurerm_key_vault_key.test.name
-  key_vault_id       = azurerm_key_vault.test.id
   storage_account_id = azurerm_storage_account.test.id
+  key_vault_id       = azurerm_key_vault.test.id
   key_version        = azurerm_key_vault_key.test.version
 
   depends_on = [azurerm_key_vault_access_policy.storage]
@@ -232,6 +232,9 @@ module "containerapps" {
   container_app_environment_name = "example-env-${random_id.env_name.hex}"
   container_app_environment_tags = {
     environment = "test"
+  }
+  log_analytics_workspace = {
+    id = azurerm_log_analytics_workspace.test.id
   }
   log_analytics_workspace_name = "testlaworkspace"
 

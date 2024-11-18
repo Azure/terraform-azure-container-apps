@@ -1,5 +1,36 @@
 # Changelog
 
+## [Unreleased](https://github.com/Azure/terraform-azure-container-apps/tree/HEAD)
+
+**Merged pull requests:**
+
+- Add support for secrets from KV [\#67](https://github.com/Azure/terraform-azure-container-apps/pull/67) ([lonegunmanb](https://github.com/lonegunmanb))
+- Add support for autoscale rules [\#66](https://github.com/Azure/terraform-azure-container-apps/pull/66) ([lonegunmanb](https://github.com/lonegunmanb))
+- Bump github.com/Azure/terraform-module-test-helper in /test [\#65](https://github.com/Azure/terraform-azure-container-apps/pull/65) ([lonegunmanb](https://github.com/lonegunmanb))
+- Bump github.com/Azure/terraform-module-test-helper in /test [\#62](https://github.com/Azure/terraform-azure-container-apps/pull/62) ([lonegunmanb](https://github.com/lonegunmanb))
+- Use oidc as e2e test authentication method [\#60](https://github.com/Azure/terraform-azure-container-apps/pull/60) ([lonegunmanb](https://github.com/lonegunmanb))
+- Add support for `container_app.ingress.ingress.ip_security_restriction` [\#50](https://github.com/Azure/terraform-azure-container-apps/pull/50) ([lonegunmanb](https://github.com/lonegunmanb))
+
+## [v0.4.0](https://github.com/Azure/terraform-azure-container-apps/tree/v0.4.0) (2023-12-26)
+
+**Merged pull requests:**
+
+- Add missing tracing tag variables [\#49](https://github.com/Azure/terraform-azure-container-apps/pull/49) ([lonegunmanb](https://github.com/lonegunmanb))
+- Add module telemetry support [\#48](https://github.com/Azure/terraform-azure-container-apps/pull/48) ([lonegunmanb](https://github.com/lonegunmanb))
+- Correct containers' `volume_mounts`'s type. [\#47](https://github.com/Azure/terraform-azure-container-apps/pull/47) ([lonegunmanb](https://github.com/lonegunmanb))
+- Add support for `init_container` [\#46](https://github.com/Azure/terraform-azure-container-apps/pull/46) ([lonegunmanb](https://github.com/lonegunmanb))
+- support workload profiles [\#45](https://github.com/Azure/terraform-azure-container-apps/pull/45) ([davidkarlsen](https://github.com/davidkarlsen))
+
+## [v0.3.0](https://github.com/Azure/terraform-azure-container-apps/tree/v0.3.0) (2023-12-20)
+
+**Merged pull requests:**
+
+- Change `output identity_ids` to new `container_app_identities` [\#44](https://github.com/Azure/terraform-azure-container-apps/pull/44) ([lonegunmanb](https://github.com/lonegunmanb))
+- Fix broken example `dapr` [\#42](https://github.com/Azure/terraform-azure-container-apps/pull/42) ([lonegunmanb](https://github.com/lonegunmanb))
+- Update default value for container\_app\_environment\_internal\_load\_balancer\_enabled [\#39](https://github.com/Azure/terraform-azure-container-apps/pull/39) ([abossard](https://github.com/abossard))
+- Support existing container apps environment [\#38](https://github.com/Azure/terraform-azure-container-apps/pull/38) ([davidkarlsen](https://github.com/davidkarlsen))
+- Add `precondition` for `var.container_app_environment_internal_load_balancer_enabled` [\#33](https://github.com/Azure/terraform-azure-container-apps/pull/33) ([lonegunmanb](https://github.com/lonegunmanb))
+
 ## [v0.2.0](https://github.com/Azure/terraform-azure-container-apps/tree/v0.2.0) (2023-08-21)
 
 **Merged pull requests:**

@@ -4,11 +4,15 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.11, < 4.0"
+      version = ">= 3.98, < 4.0"
     }
     curl = {
       source  = "anschoewe/curl"
       version = "1.0.2"
+    }
+    modtm = {
+      source  = "Azure/modtm"
+      version = ">= 0.2.0, < 1.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -19,4 +23,8 @@ terraform {
 
 provider "azurerm" {
   features {}
+}
+
+provider "modtm" {
+  enabled = false
 }
