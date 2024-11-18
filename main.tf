@@ -1,5 +1,7 @@
 locals {
-  container_app_environment_id = try(data.azurerm_container_app_environment.container_env[0].id, azurerm_container_app_environment.container_env[0].id)
+  container_app_environment_default_domain    = try(data.azurerm_container_app_environment.container_env[0].default_domain, azurerm_container_app_environment.container_env[0].default_domain)
+  container_app_environment_id                = try(data.azurerm_container_app_environment.container_env[0].id, azurerm_container_app_environment.container_env[0].id)
+  container_app_environment_static_ip_address = try(azurerm_container_app_environment.container_env[0].static_ip_address, data.azurerm_container_app_environment.container_env[0].static_ip_address)
 }
 
 resource "azurerm_log_analytics_workspace" "laws" {
