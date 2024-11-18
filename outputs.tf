@@ -25,10 +25,10 @@ output "container_app_identities" {
 
 output "container_app_ips" {
   description = "The IPs of the Latest Revision of the Container App."
-  value       = try(azurerm_container_app_environment.container_env[0].static_ip_address, data.azurerm_container_app_environment.container_env[0].static_ip_address)
+  value       = local.container_app_environment_static_ip_address
 }
 
 output "default_domain" {
   description = "The default domain of the Container App Environment."
-  value       = azurerm_container_app_environment.container_env.default_domain
+  value       = local.container_app_environment_default_domain
 }
