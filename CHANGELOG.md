@@ -4,12 +4,14 @@
 
 **Merged pull requests:**
 
+- Better Front Door and Private Link integration due to module outputs  [\#68](https://github.com/Azure/terraform-azure-container-apps/pull/68) ([lonegunmanb](https://github.com/lonegunmanb))
 - Add support for secrets from KV [\#67](https://github.com/Azure/terraform-azure-container-apps/pull/67) ([lonegunmanb](https://github.com/lonegunmanb))
 - Add support for autoscale rules [\#66](https://github.com/Azure/terraform-azure-container-apps/pull/66) ([lonegunmanb](https://github.com/lonegunmanb))
 - Bump github.com/Azure/terraform-module-test-helper in /test [\#65](https://github.com/Azure/terraform-azure-container-apps/pull/65) ([lonegunmanb](https://github.com/lonegunmanb))
 - Bump github.com/Azure/terraform-module-test-helper in /test [\#62](https://github.com/Azure/terraform-azure-container-apps/pull/62) ([lonegunmanb](https://github.com/lonegunmanb))
 - Use oidc as e2e test authentication method [\#60](https://github.com/Azure/terraform-azure-container-apps/pull/60) ([lonegunmanb](https://github.com/lonegunmanb))
 - Add support for `container_app.ingress.ingress.ip_security_restriction` [\#50](https://github.com/Azure/terraform-azure-container-apps/pull/50) ([lonegunmanb](https://github.com/lonegunmanb))
+- Better Front Door and Private Link integration due to module outputs [\#20](https://github.com/Azure/terraform-azure-container-apps/pull/20) ([icklsede](https://github.com/icklsede))
 
 ## [v0.4.0](https://github.com/Azure/terraform-azure-container-apps/tree/v0.4.0) (2023-12-26)
 
